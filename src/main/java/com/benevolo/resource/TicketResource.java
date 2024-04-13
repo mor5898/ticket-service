@@ -24,7 +24,7 @@ public class TicketResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<TicketDTO> get(@PathParam("eventId") String id) {
-        return ticketService.findAll();
+        return ticketService.findAllByEventId(id);
     }
 
 }

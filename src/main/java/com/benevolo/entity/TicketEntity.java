@@ -2,13 +2,14 @@ package com.benevolo.entity;
 
 import com.benevolo.utils.TicketStatus;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 
 import java.util.List;
 
 @Entity
 @Table(name = "ticket")
-public class TicketEntity {
+public class TicketEntity extends PanacheEntityBase {
 
     @Id
     private String id;
@@ -20,6 +21,9 @@ public class TicketEntity {
     @ManyToOne
     @JoinColumn(name = "customer_id")
     private CustomerEntity customer;
+    @ManyToOne
+    @JoinColumn(name = "ticket_type_id")
+    private TicketTypeEntity ticketType;
 
     public String getId() {
         return id;
@@ -59,5 +63,13 @@ public class TicketEntity {
 
     public void setCustomer(CustomerEntity customer) {
         this.customer = customer;
+    }
+
+    public TicketTypeEntity getTicketType() {
+        return ticketType;
+    }
+
+    public void setTicketType(TicketTypeEntity ticketType) {
+        this.ticketType = ticketType;
     }
 }
