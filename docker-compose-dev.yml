@@ -7,6 +7,7 @@ services:
       args:
         - DATABASE_USERNAME=${DATABASE_DEV_USERNAME}
         - DATABASE_PASSWORD=${DATABASE_DEV_PASSWORD}
+        - KEYCLOAK_SECRET=${KEYCLOAK_SECRET}
     container_name: dev.benevolo.ticket-service
     image: ghcr.io/thi24/dev.benevolo.ticket-service:${GITHUB_RUN_ID}
     environment:
