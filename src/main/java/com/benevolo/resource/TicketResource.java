@@ -3,15 +3,12 @@ package com.benevolo.resource;
 import com.benevolo.dto.TicketDTO;
 import com.benevolo.service.TicketService;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 
 import java.util.List;
 
-@Path("/tickets/{eventId}")
+@Path("/tickets")
 public class TicketResource {
 
     private final TicketService ticketService;
@@ -21,10 +18,10 @@ public class TicketResource {
         this.ticketService = ticketService;
     }
 
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<TicketDTO> get(@PathParam("eventId") String id) {
-        return ticketService.findAllByEventId(id);
+    @PUT
+    @Path("/{ticketId}")
+    public void put(@PathParam("ticketId") String ticketId, TicketDTO ticketDTO) {
+        ticketService.update(ticketId, ticketDTO);
     }
 
 }

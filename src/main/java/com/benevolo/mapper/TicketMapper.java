@@ -12,7 +12,7 @@ public class TicketMapper {
     }
 
     public static TicketDTO map(TicketEntity ticket) {
-        return new TicketDTO(ticket.getId(), ticket.getStatus(), CustomerMapper.map(ticket.getCustomer()));
+        return new TicketDTO(ticket.getId(), ticket.getPrice(), ticket.getTaxRate(), ticket.getStatus(), CustomerMapper.map(ticket.getCustomer()));
     }
 
 }

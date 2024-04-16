@@ -1,5 +1,6 @@
 package com.benevolo.entity;
 
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
@@ -9,7 +10,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "event")
-public class EventEntity {
+public class EventEntity extends PanacheEntityBase {
 
     @Id
     private String id;
