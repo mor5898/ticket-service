@@ -25,6 +25,17 @@ public class TicketEntity {
     @JoinColumn(name = "ticket_type_id")
     private TicketTypeEntity ticketType;
 
+    public TicketEntity() {
+    }
+
+    public TicketEntity(TicketStatus status, int price, int taxRate, CustomerEntity customer, TicketTypeEntity ticketType) {
+        this.status = status;
+        this.price = price;
+        this.taxRate = taxRate;
+        this.customer = customer;
+        this.ticketType = ticketType;
+    }
+
     public String getId() {
         return id;
     }

@@ -7,12 +7,15 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "ticket_type")
-public class TicketTypeEntity {
+public class TicketTypeEntity extends PanacheEntityBase {
 
     @Id
     private String id;
     @Column(name = "ticket_type_name")
     private String name;
+    private int price;
+    @Column(name = "tax_rate")
+    private int taxRate;
     @ManyToOne
     @JoinColumn(name = "event_id")
     private EventEntity event;
@@ -39,5 +42,21 @@ public class TicketTypeEntity {
 
     public void setEvent(EventEntity event) {
         this.event = event;
+    }
+
+    public int getPrice() {
+        return price;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
+    }
+
+    public int getTaxRate() {
+        return taxRate;
+    }
+
+    public void setTaxRate(int taxRate) {
+        this.taxRate = taxRate;
     }
 }

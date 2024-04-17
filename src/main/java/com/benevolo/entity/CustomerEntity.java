@@ -1,12 +1,13 @@
 package com.benevolo.entity;
 
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 
 import java.util.List;
 
 @Entity
 @Table(name = "customer")
-public class CustomerEntity {
+public class CustomerEntity extends PanacheEntityBase {
 
     @Id
     @Column(name = "stripe_id")
