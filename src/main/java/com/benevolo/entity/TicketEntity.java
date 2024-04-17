@@ -26,7 +26,11 @@ public class TicketEntity {
     @JoinColumn(name = "customer_id")
     private CustomerEntity customer;
 
+    @Column(name = "ticket_type_id")
     private String ticketTypeId;
+
+    @Column(name = "event_id")
+    private String eventId;
 
     public TicketEntity() {
     }
@@ -85,5 +89,13 @@ public class TicketEntity {
 
     public void setTicketTypeId(String ticketTypeId) {
         this.ticketTypeId = ticketTypeId;
+    }
+
+    public String getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(String eventId) {
+        this.eventId = eventId;
     }
 }

@@ -10,4 +10,8 @@ import java.util.List;
 @ApplicationScoped
 public class TicketRepo implements PanacheRepositoryBase<TicketEntity, String> {
 
+    public List<TicketEntity> findByEventId(String eventId) {
+        return list("eventId" ,eventId);
+    }
+
 }

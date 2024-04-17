@@ -23,8 +23,7 @@ public class TicketService {
     }
 
     public List<TicketDTO> findAllByEventId(String eventId) {
-        //return ticketMapper.map(ticketRepo.findByEvent(eventRepo.findById(eventId)));
-        throw new NotImplementedYet();
+        return ticketMapper.map(ticketRepo.findByEventId(eventId));
     }
 
     public void update(String ticketId, TicketDTO ticketDTO) {

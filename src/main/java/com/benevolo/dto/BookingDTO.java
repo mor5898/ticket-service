@@ -1,2 +1,4 @@
-package com.benevolo.dto;public class BookingDTO {
+package com.benevolo.dto;
+
+public record BookingDTO(int quantity, CustomerDTO customer) {
 }

@@ -1,20 +1,18 @@
 package com.benevolo.client;
 
 import com.benevolo.dto.TicketTypeDTO;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
-@Path("/ticket-types")
-@RegisterRestClient
+@RegisterRestClient(configKey = "event-service")
 public interface TicketTypeClient {
 
     @GET
-    @Path("/{id}")
+    @Path("/ticket-types/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    TicketTypeDTO findById(@PathParam("id") String id);
+    TicketTypeDTO findById(@HeaderParam("Authorization") String token, @PathParam("id") String id);
 
 }
