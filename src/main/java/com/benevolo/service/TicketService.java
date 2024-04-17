@@ -2,14 +2,11 @@ package com.benevolo.service;
 
 import com.benevolo.dto.TicketDTO;
 import com.benevolo.entity.TicketEntity;
-import com.benevolo.entity.TicketTypeEntity;
 import com.benevolo.mapper.TicketMapper;
-import com.benevolo.repo.EventRepo;
 import com.benevolo.repo.TicketRepo;
-import com.benevolo.repo.TicketTypeRepo;
-import com.benevolo.utils.TicketStatus;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import org.jboss.resteasy.reactive.common.NotImplementedYet;
 
 import java.util.List;
 
@@ -17,18 +14,17 @@ import java.util.List;
 public class TicketService {
 
     private final TicketRepo ticketRepo;
-    private final TicketTypeRepo ticketTypeRepo;
-    private final EventRepo eventRepo;
+    private final TicketMapper ticketMapper;
 
     @Inject
-    public TicketService(TicketRepo ticketRepo, TicketTypeRepo ticketTypeRepo, EventRepo eventRepo) {
+    public TicketService(TicketRepo ticketRepo, TicketMapper ticketMapper) {
         this.ticketRepo = ticketRepo;
-        this.ticketTypeRepo = ticketTypeRepo;
-        this.eventRepo = eventRepo;
+        this.ticketMapper = ticketMapper;
     }
 
     public List<TicketDTO> findAllByEventId(String eventId) {
-        return TicketMapper.map(ticketRepo.findByEvent(eventRepo.findById(eventId)));
+        //return ticketMapper.map(ticketRepo.findByEvent(eventRepo.findById(eventId)));
+        throw new NotImplementedYet();
     }
 
     public void update(String ticketId, TicketDTO ticketDTO) {
@@ -40,7 +36,7 @@ public class TicketService {
     }
 
     public void save(String ticketTypeId) {
-        TicketTypeEntity ticketType = ticketTypeRepo.findById(ticketTypeId);
-        ticketRepo.persist(new TicketEntity(TicketStatus.PENDING, ticketType.getPrice(), ticketType.getTaxRate(), null, ticketType));
+        //ticketRepo.persist(new TicketEntity(TicketStatus.PENDING, ticketType.getPrice(), ticketType.getTaxRate(), null, ticketType));
+        throw new NotImplementedYet();
     }
 }

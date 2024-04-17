@@ -13,27 +13,30 @@ public class TicketEntity {
 
     @Id
     private String id;
+
     @Enumerated(EnumType.STRING)
     private TicketStatus status;
+
     private int price;
+
     @Column(name = "tax_rate")
     private int taxRate;
+
     @ManyToOne
     @JoinColumn(name = "customer_id")
     private CustomerEntity customer;
-    @ManyToOne
-    @JoinColumn(name = "ticket_type_id")
-    private TicketTypeEntity ticketType;
+
+    private String ticketTypeId;
 
     public TicketEntity() {
     }
 
-    public TicketEntity(TicketStatus status, int price, int taxRate, CustomerEntity customer, TicketTypeEntity ticketType) {
+    public TicketEntity(TicketStatus status, int price, int taxRate, CustomerEntity customer, String ticketTypeId) {
         this.status = status;
         this.price = price;
         this.taxRate = taxRate;
         this.customer = customer;
-        this.ticketType = ticketType;
+        this.ticketTypeId = ticketTypeId;
     }
 
     public String getId() {
@@ -76,11 +79,11 @@ public class TicketEntity {
         this.customer = customer;
     }
 
-    public TicketTypeEntity getTicketType() {
-        return ticketType;
+    public String getTicketTypeId() {
+        return ticketTypeId;
     }
 
-    public void setTicketType(TicketTypeEntity ticketType) {
-        this.ticketType = ticketType;
+    public void setTicketTypeId(String ticketTypeId) {
+        this.ticketTypeId = ticketTypeId;
     }
 }
