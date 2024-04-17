@@ -22,8 +22,12 @@ public class TicketService {
         this.ticketMapper = ticketMapper;
     }
 
-    public List<TicketDTO> findAllByEventId(String eventId) {
-        return ticketMapper.map(ticketRepo.findByEventId(eventId));
+    public List<TicketDTO> findByEventId(String eventId, Integer pageIndex, Integer pageSize) {
+        return ticketMapper.map(ticketRepo.findByEventId(eventId, pageIndex, pageSize));
+    }
+
+    public long countByEventId(String eventId, Integer pageSize) {
+        return ticketRepo.countByEventId(eventId) / pageSize + 1;
     }
 
     public void update(String ticketId, TicketDTO ticketDTO) {
