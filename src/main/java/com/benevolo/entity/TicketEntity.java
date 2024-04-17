@@ -9,7 +9,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "ticket")
-public class TicketEntity extends PanacheEntityBase {
+public class TicketEntity {
 
     @Id
     private String id;
