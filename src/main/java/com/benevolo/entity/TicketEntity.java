@@ -6,6 +6,7 @@ import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "ticket")
@@ -22,7 +23,7 @@ public class TicketEntity {
     @Column(name = "tax_rate")
     private int taxRate;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "customer_id")
     private CustomerEntity customer;
 
@@ -35,12 +36,14 @@ public class TicketEntity {
     public TicketEntity() {
     }
 
-    public TicketEntity(TicketStatus status, int price, int taxRate, CustomerEntity customer, String ticketTypeId) {
+    public TicketEntity(TicketStatus status, int price, int taxRate, CustomerEntity customer, String ticketTypeId, String eventId) {
+        this.id = UUID.randomUUID().toString();
         this.status = status;
         this.price = price;
         this.taxRate = taxRate;
         this.customer = customer;
         this.ticketTypeId = ticketTypeId;
+        this.eventId = eventId;
     }
 
     public String getId() {
