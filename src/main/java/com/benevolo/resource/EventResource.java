@@ -8,6 +8,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 import java.util.List;
 
@@ -22,10 +23,10 @@ public class EventResource {
     }
 
     @GET
-    @Path("/tickets")
+    @Path("/tickets/{pageIndex}/{pageSize}")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<TicketDTO> get(@PathParam("eventId") String id) {
-        return ticketService.findAllByEventId(id);
+    public Response get(@PathParam("eventId") String id, @PathParam("pageIndex") Integer pageIndex, @PathParam("pageSize") Integer pageSize) {
+        return Response.ok(ticketService.findByEventId(id, pageIndex, pageSize), MediaType.APPLICATION_JSON).header("X-Page-Size", ticketService.countByEventId(id, pageSize)).build();
     }
 
 }
