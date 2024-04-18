@@ -1,34 +1,49 @@
 package com.benevolo.service;
 
+import com.benevolo.client.TicketTypeClient;
+import com.benevolo.dto.BookingDTO;
 import com.benevolo.dto.TicketDTO;
+import com.benevolo.dto.TicketTypeDTO;
+import com.benevolo.entity.CustomerEntity;
 import com.benevolo.entity.TicketEntity;
-import com.benevolo.entity.TicketTypeEntity;
 import com.benevolo.mapper.TicketMapper;
-import com.benevolo.repo.EventRepo;
 import com.benevolo.repo.TicketRepo;
-import com.benevolo.repo.TicketTypeRepo;
 import com.benevolo.utils.TicketStatus;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
+import org.eclipse.microprofile.jwt.JsonWebToken;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.jboss.resteasy.reactive.common.NotImplementedYet;
 
+import java.util.LinkedList;
 import java.util.List;
 
 @ApplicationScoped
 public class TicketService {
 
+    @RestClient
+    TicketTypeClient ticketTypeClient;
+
     private final TicketRepo ticketRepo;
-    private final TicketTypeRepo ticketTypeRepo;
-    private final EventRepo eventRepo;
+
+    private final TicketMapper ticketMapper;
+
+    private final JsonWebToken jsonWebToken;
 
     @Inject
-    public TicketService(TicketRepo ticketRepo, TicketTypeRepo ticketTypeRepo, EventRepo eventRepo) {
+    public TicketService(TicketRepo ticketRepo, TicketMapper ticketMapper, JsonWebToken jsonWebToken) {
         this.ticketRepo = ticketRepo;
-        this.ticketTypeRepo = ticketTypeRepo;
-        this.eventRepo = eventRepo;
+        this.ticketMapper = ticketMapper;
+        this.jsonWebToken = jsonWebToken;
     }
 
-    public List<TicketDTO> findAllByEventId(String eventId) {
-        return TicketMapper.map(ticketRepo.findByEvent(eventRepo.findById(eventId)));
+    public List<TicketDTO> findByEventId(String eventId, Integer pageIndex, Integer pageSize) {
+        return ticketMapper.map(ticketRepo.findByEventId(eventId, pageIndex, pageSize));
+    }
+
+    public long countByEventId(String eventId, Integer pageSize) {
+        return ticketRepo.countByEventId(eventId) / pageSize + 1;
     }
 
     public void update(String ticketId, TicketDTO ticketDTO) {
@@ -39,8 +54,19 @@ public class TicketService {
         ticketRepo.persist(ticketEntity);
     }
 
-    public void save(String ticketTypeId) {
-        TicketTypeEntity ticketType = ticketTypeRepo.findById(ticketTypeId);
-        ticketRepo.persist(new TicketEntity(TicketStatus.PENDING, ticketType.getPrice(), ticketType.getTaxRate(), null, ticketType));
+    @Transactional
+    public void save(List<BookingDTO> bookings) {
+        final List<TicketEntity> tickets = new LinkedList<>();
+        for(BookingDTO booking : bookings) {
+            for(int i = 0; i < booking.quantity(); i++) {
+                tickets.add(generateTicket(booking));
+            }
+        }
+        ticketRepo.persist(tickets);
+    }
+
+    private TicketEntity generateTicket(BookingDTO booking) {
+        TicketTypeDTO ticketTypeDTO = ticketTypeClient.findById("Bearer " + jsonWebToken.getRawToken(), booking.ticketTypeId());
+        return new TicketEntity(TicketStatus.PENDING, ticketTypeDTO.price(), ticketTypeDTO.taxRate(), new CustomerEntity(booking.customer().stripeId(), booking.customer().email()), ticketTypeDTO.id(), booking.eventId());
     }
 }

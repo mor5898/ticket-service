@@ -1,5 +1,6 @@
 package com.benevolo.resource;
 
+import com.benevolo.dto.BookingDTO;
 import com.benevolo.dto.TicketDTO;
 import com.benevolo.service.TicketService;
 import jakarta.inject.Inject;
@@ -18,8 +19,17 @@ public class TicketResource {
         this.ticketService = ticketService;
     }
 
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public void post(List<BookingDTO> bookings) {
+        ticketService.save(bookings);
+    }
+
     @PUT
     @Path("/{ticketId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     public void put(@PathParam("ticketId") String ticketId, TicketDTO ticketDTO) {
         ticketService.update(ticketId, ticketDTO);
     }

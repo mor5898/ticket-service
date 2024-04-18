@@ -6,34 +6,44 @@ import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "ticket")
-public class TicketEntity extends PanacheEntityBase {
+public class TicketEntity {
 
     @Id
     private String id;
+
     @Enumerated(EnumType.STRING)
     private TicketStatus status;
+
     private int price;
+
     @Column(name = "tax_rate")
     private int taxRate;
-    @ManyToOne
+
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "customer_id")
     private CustomerEntity customer;
-    @ManyToOne
-    @JoinColumn(name = "ticket_type_id")
-    private TicketTypeEntity ticketType;
+
+    @Column(name = "ticket_type_id")
+    private String ticketTypeId;
+
+    @Column(name = "event_id")
+    private String eventId;
 
     public TicketEntity() {
     }
 
-    public TicketEntity(TicketStatus status, int price, int taxRate, CustomerEntity customer, TicketTypeEntity ticketType) {
+    public TicketEntity(TicketStatus status, int price, int taxRate, CustomerEntity customer, String ticketTypeId, String eventId) {
+        this.id = UUID.randomUUID().toString();
         this.status = status;
         this.price = price;
         this.taxRate = taxRate;
         this.customer = customer;
-        this.ticketType = ticketType;
+        this.ticketTypeId = ticketTypeId;
+        this.eventId = eventId;
     }
 
     public String getId() {
@@ -76,11 +86,19 @@ public class TicketEntity extends PanacheEntityBase {
         this.customer = customer;
     }
 
-    public TicketTypeEntity getTicketType() {
-        return ticketType;
+    public String getTicketTypeId() {
+        return ticketTypeId;
     }
 
-    public void setTicketType(TicketTypeEntity ticketType) {
-        this.ticketType = ticketType;
+    public void setTicketTypeId(String ticketTypeId) {
+        this.ticketTypeId = ticketTypeId;
+    }
+
+    public String getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(String eventId) {
+        this.eventId = eventId;
     }
 }
