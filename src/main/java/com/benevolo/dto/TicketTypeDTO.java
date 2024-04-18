@@ -4,8 +4,8 @@ import java.time.LocalDateTime;
 
 public record TicketTypeDTO(String id,
                             String name,
-                            double price,
-                            double taxRate,
+                            int price,
+                            int taxRate,
                             int capacity,
                             boolean active,
                             LocalDateTime validFrom,
