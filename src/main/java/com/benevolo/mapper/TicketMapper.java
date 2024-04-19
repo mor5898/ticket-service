@@ -29,7 +29,7 @@ public class TicketMapper {
     }
 
     public TicketDTO map(TicketEntity ticket) {
-        return new TicketDTO(ticket.getId(), ticket.getPrice(), ticket.getTaxRate(), ticket.getStatus(), CustomerMapper.map(ticket.getCustomer()), ticketTypeClient.findById("Bearer " + jsonWebToken.getRawToken(), ticket.getTicketTypeId()));
+        return new TicketDTO(ticket.getId(), ticket.getPublicId(), ticket.getPrice(), ticket.getTaxRate(), ticket.getStatus(), ticket.getBookedAt(), CustomerMapper.map(ticket.getCustomer()), ticketTypeClient.findById("Bearer " + jsonWebToken.getRawToken(), ticket.getTicketTypeId()));
     }
 
 }
