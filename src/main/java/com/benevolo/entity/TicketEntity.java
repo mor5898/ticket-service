@@ -2,7 +2,7 @@ package com.benevolo.entity;
 
 import com.benevolo.utils.TicketStatus;
 import jakarta.persistence.*;
-
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -12,8 +12,14 @@ public class TicketEntity {
     @Id
     private String id;
 
+    @Column(name = "public_id")
+    private String publicId;
+
     @Enumerated(EnumType.STRING)
     private TicketStatus status;
+
+    @Column(name = "booked_at")
+    private LocalDateTime bookedAt;
 
     private int price;
 
@@ -98,5 +104,21 @@ public class TicketEntity {
 
     public void setEventId(String eventId) {
         this.eventId = eventId;
+    }
+
+    public String getPublicId() {
+        return publicId;
+    }
+
+    public void setPublicId(String publicId) {
+        this.publicId = publicId;
+    }
+
+    public LocalDateTime getBookedAt() {
+        return bookedAt;
+    }
+
+    public void setBookedAt(LocalDateTime bookedAt) {
+        this.bookedAt = bookedAt;
     }
 }
