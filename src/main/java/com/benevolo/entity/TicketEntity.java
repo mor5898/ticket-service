@@ -1,11 +1,8 @@
 package com.benevolo.entity;
 
 import com.benevolo.utils.TicketStatus;
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -34,6 +31,7 @@ public class TicketEntity {
     private String eventId;
 
     public TicketEntity() {
+        // empty constructor
     }
 
     public TicketEntity(TicketStatus status, int price, int taxRate, CustomerEntity customer, String ticketTypeId, String eventId) {

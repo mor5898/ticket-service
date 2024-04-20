@@ -3,13 +3,11 @@ package com.benevolo.mapper;
 import com.benevolo.client.TicketTypeClient;
 import com.benevolo.dto.TicketDTO;
 import com.benevolo.entity.TicketEntity;
-import io.quarkus.rest.client.reactive.QuarkusRestClientBuilder;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
-import java.net.URI;
 import java.util.List;
 
 @ApplicationScoped

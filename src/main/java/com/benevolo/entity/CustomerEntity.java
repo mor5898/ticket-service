@@ -22,6 +22,7 @@ public class CustomerEntity extends PanacheEntityBase {
     private List<TicketEntity> tickets;
 
     public CustomerEntity() {
+        // empty constructor
     }
 
     public CustomerEntity(String stripeId, String email) {

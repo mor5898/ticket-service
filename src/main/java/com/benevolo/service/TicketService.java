@@ -14,7 +14,6 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
-import org.jboss.resteasy.reactive.common.NotImplementedYet;
 
 import java.util.LinkedList;
 import java.util.List;
