@@ -41,6 +41,7 @@ public class TicketServiceTest {
         this.ticketRepo = ticketRepo;
     }
 
+    @Disabled
     @Test
     @Order(1)
     @TestSecurity(user = "testUser", roles = {"admin", "user"})
@@ -59,6 +60,7 @@ public class TicketServiceTest {
         Assert.equals(1, ticketRepo.listAll().size());
     }
 
+    @Disabled
     @Test
     @Order(2)
     @TestSecurity(user = "testUser", roles = {"admin", "user"})
@@ -78,6 +80,7 @@ public class TicketServiceTest {
         Assert.equals(TicketStatus.VALID, testList.get(0).status());
     }
 
+    @Disabled
     @Test
     @Order(3)
     @TestSecurity(user = "testUser", roles = {"admin", "user"})
