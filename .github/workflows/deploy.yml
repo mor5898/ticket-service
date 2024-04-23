@@ -8,11 +8,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      DATABASE_DEV_USERNAME: ${{ secrets.DATABASE_DEV_USERNAME }}
-      DATABASE_DEV_PASSWORD: ${{ secrets.DATABASE_DEV_PASSWORD }}
-      DATABASE_PROD_USERNAME: ${{ secrets.DATABASE_PROD_USERNAME }}
-      DATABASE_PROD_PASSWORD: ${{ secrets.DATABASE_PROD_PASSWORD }}
+      DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
+      DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
       KEYCLOAK_SECRET: ${{ secrets.KEYCLOAK_SECRET }}
+      EVENT_SERVICE_BASE_URL: https://benevolo.de/api/event-service
 
     steps:
     - name: Checkout
@@ -24,6 +23,16 @@ jobs:
         registry: ghcr.io
         username: ${{ github.repository_owner }}
         password: ${{ secrets.OWNER_PASSWORD }}
+
+    - name: Set env variables for dev environment
+      if: github.ref == 'refs/heads/develop'
+      run: |
+          echo "EVENT_SERVICE_BASE_URL=https://dev.benevolo.de/api/event-service" >> $GITHUB_ENV
+
+    - name: Set env variables for prod environment
+      if: github.ref == 'refs/heads/main'
+      run: |
+        echo "EVENT_SERVICE_BASE_URL=https://benevolo.de/api/event-service" >> $GITHUB_ENV
 
     - name: Build and push prod Docker image
       if: github.ref == 'refs/heads/main'
