@@ -70,7 +70,7 @@ public class TicketServiceTest {
 
         Assert.equals(TicketStatus.PENDING, ticketDTO.status());
 
-        TicketDTO refTicketDTO = new TicketDTO(ticketDTO.id(), ticketDTO.price(), ticketDTO.taxRate(), TicketStatus.VALID, ticketDTO.customer(), ticketDTO.ticketType());
+        TicketDTO refTicketDTO = new TicketDTO(ticketDTO.id(), "328473", ticketDTO.price(), ticketDTO.taxRate(), TicketStatus.VALID, LocalDateTime.now(), ticketDTO.customer(), ticketDTO.ticketType());
 
         //ticketService.update(ticketID, refTicketDTO);
         ValidatableResponse validatableResponse = given().contentType(ContentType.JSON).body(refTicketDTO).when().put("/tickets/" + ticketID).then().statusCode(204);
