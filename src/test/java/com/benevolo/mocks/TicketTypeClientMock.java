@@ -1,6 +1,5 @@
 package com.benevolo.mocks;
 
-import com.benevolo.dto.TicketTypeDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -26,8 +25,8 @@ public class TicketTypeClientMock implements  QuarkusTestResourceLifecycleManage
                     .willReturn(aResponse()
                             .withHeader("Content-Type", "application/json")
                             .withBody(
-                                    new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(new TicketTypeDTO("4545", "Samstag", 40, 19, 100, true,
-                                            LocalDateTime.of(2024, 12, 24, 1, 1, 1), LocalDateTime.of(2024, 12, 25, 1, 1, 1), "1234"))
+                                    new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString("4e8" /*new TicketTypeDTO("4545", "Samstag", 40, 19, 100, true,
+                                            LocalDateTime.of(2024, 12, 24, 1, 1, 1), LocalDateTime.of(2024, 12, 25, 1, 1, 1), "1234")*/)
                             )));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);

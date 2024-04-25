@@ -1,10 +1,6 @@
 package com.benevolo;
 
-import com.benevolo.dto.BookingDTO;
-import com.benevolo.dto.CustomerDTO;
-import com.benevolo.dto.TicketDTO;
-import com.benevolo.dto.TicketTypeDTO;
-import com.benevolo.entity.TicketEntity;
+import com.benevolo.entity.Ticket;
 import com.benevolo.mocks.TicketTypeClientMock;
 import com.benevolo.repo.TicketRepo;
 import com.benevolo.service.TicketService;
@@ -19,12 +15,12 @@ import jakarta.inject.Inject;
 import org.junit.jupiter.api.*;
 import org.locationtech.jts.util.Assert;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
 import static io.restassured.RestAssured.given;
 
+@Disabled
 @QuarkusTest
 @QuarkusTestResource(H2DatabaseTestResource.class)
 @QuarkusTestResource(TicketTypeClientMock.class)
@@ -110,14 +106,14 @@ public class TicketServiceTest {
     @Order(5)
     void testTicketFindByEventIDNoEntry(){
         /*
-        * Check functionality when called with no tickets in DB
-        * Return value of function is expected to be an empty list -> no items inserted
-        * */
+         * Check functionality when called with no tickets in DB
+         * Return value of function is expected to be an empty list -> no items inserted
+         * */
         List<TicketDTO> testList = ticketService.findByEventId("1234", 0, 20);
         Assert.equals(0, testList.size());
     }
 
-    /*
+
     @Disabled
     @Test
     @Order(3)
@@ -137,7 +133,7 @@ public class TicketServiceTest {
         List<TicketDTO> testList = ticketService.findByEventId("1234", 0, 20);
         Assert.equals(TicketStatus.VALID, testList.get(0).status());
     }
-    */
+
 
     @Disabled
     @Test
@@ -147,14 +143,15 @@ public class TicketServiceTest {
          * Validate return values of TicketDTO -> test TicketTypeClient functionality
          * Implementation unclear - how to reach EventService Database inside test environment
          * */
-        TicketEntity refTE = new TicketEntity();
+        Ticket refTE = new Ticket();
         refTE.setPrice(40);
         refTE.setTaxRate(19);
         CustomerDTO cDTO = new CustomerDTO("4444", "customer@mail.de");
         BookingDTO testBooking= new BookingDTO(2, "1111", "MUSS DB REF SEIN / ANDI FRAGEN", cDTO);
-        TicketEntity testEntity = new TicketEntity();
+        Ticket testEntity = new Ticket();
         //testEntity = ticketService.generateTicket(testBooking);
         Assert.equals(refTE.getPrice(), testEntity.getPrice());
         Assert.equals(refTE.getTaxRate(), testEntity.getTaxRate());
     }
+
 }

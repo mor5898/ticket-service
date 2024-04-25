@@ -1,5 +1,7 @@
 package com.benevolo.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 
@@ -8,9 +10,10 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "customer")
-public class CustomerEntity extends PanacheEntityBase {
+public class Customer extends PanacheEntityBase {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     @Column(name = "stripe_id")
@@ -18,15 +21,15 @@ public class CustomerEntity extends PanacheEntityBase {
 
     private String email;
 
+    @JsonBackReference
     @OneToMany(mappedBy = "customer")
-    private List<TicketEntity> tickets;
+    private List<Booking> bookings;
 
-    public CustomerEntity() {
+    public Customer() {
         // empty constructor
     }
 
-    public CustomerEntity(String stripeId, String email) {
-        this.id = UUID.randomUUID().toString();
+    public Customer(String stripeId, String email) {
         this.stripeId = stripeId;
         this.email = email;
     }
@@ -37,6 +40,14 @@ public class CustomerEntity extends PanacheEntityBase {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public List<Booking> getBookings() {
+        return bookings;
+    }
+
+    public void setBookings(List<Booking> bookings) {
+        this.bookings = bookings;
     }
 
     public String getStripeId() {
@@ -53,13 +64,5 @@ public class CustomerEntity extends PanacheEntityBase {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public List<TicketEntity> getTickets() {
-        return tickets;
-    }
-
-    public void setTickets(List<TicketEntity> tickets) {
-        this.tickets = tickets;
     }
 }
