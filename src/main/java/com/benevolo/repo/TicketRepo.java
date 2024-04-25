@@ -16,7 +16,7 @@ public class TicketRepo implements PanacheRepositoryBase<Ticket, String> {
     }
 
     public long countByEventId(String eventId) {
-        return count("eventId" ,eventId);
+        return count("SELECT COUNT(t) FROM Ticket AS t, BookingItem AS bi, Booking AS b WHERE t.bookingItem = bi AND bi.booking = b AND b.eventId = :eventId", Parameters.with("eventId", eventId));
     }
 
 }

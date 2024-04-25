@@ -37,7 +37,7 @@ public class TicketService {
     }
 
     public long countByEventId(String eventId, Integer pageSize) {
-        return ticketRepo.countByEventId(eventId) / pageSize + 1;
+        return (long) Math.ceil((ticketRepo.countByEventId(eventId) * 1.0) / pageSize);
     }
 
     public void update(String ticketId, Ticket ticket) {
