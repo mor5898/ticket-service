@@ -1,13 +1,13 @@
 package com.benevolo.mocks;
 
-import com.benevolo.dto.TicketTypeDTO;
+import com.benevolo.entity.TicketType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
@@ -18,7 +18,7 @@ public class TicketTypeClientMock implements  QuarkusTestResourceLifecycleManage
 
     @Override
     public Map<String, String> start(){
-        wireMockServer = new WireMockServer();
+        wireMockServer = new WireMockServer(options().port(8082));
         wireMockServer.start();
 
         try {
@@ -26,9 +26,8 @@ public class TicketTypeClientMock implements  QuarkusTestResourceLifecycleManage
                     .willReturn(aResponse()
                             .withHeader("Content-Type", "application/json")
                             .withBody(
-                                    new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(new TicketTypeDTO("4545", "Samstag", 40, 19, 100, true,
-                                            LocalDateTime.of(2024, 12, 24, 1, 1, 1), LocalDateTime.of(2024, 12, 25, 1, 1, 1), "1234"))
-                            )));
+                                new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(new TicketType("48935", 2000, 19, "Samstagsticket")
+                            ))));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
