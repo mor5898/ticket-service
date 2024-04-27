@@ -1,6 +1,7 @@
 package com.benevolo.repo;
 
 import com.benevolo.entity.Ticket;
+import com.benevolo.utils.TicketStatus;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import io.quarkus.panache.common.Parameters;
 import jakarta.enterprise.context.ApplicationScoped;
