@@ -7,6 +7,16 @@ public class TicketType {
     private int taxRate;
     private String name;
 
+    public TicketType() {
+    }
+
+    public TicketType(String id, int price, int taxRate, String name) {
+        this.id = id;
+        this.price = price;
+        this.taxRate = taxRate;
+        this.name = name;
+    }
+
     public String getId() {
         return id;
     }

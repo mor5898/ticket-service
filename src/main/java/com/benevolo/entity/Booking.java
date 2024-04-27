@@ -1,6 +1,7 @@
 package com.benevolo.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
@@ -20,6 +21,7 @@ public class Booking extends PanacheEntityBase {
     @Column(name = "booked_at")
     private LocalDateTime bookedAt;
 
+    @JsonIgnore
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "customer_id")
     private Customer customer;
@@ -27,7 +29,7 @@ public class Booking extends PanacheEntityBase {
     @Column(name = "event_id")
     private String eventId;
 
-    @JsonBackReference
+    @JsonManagedReference(value="booking-item")
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL)
     private List<BookingItem> bookingItems;
 
