@@ -50,11 +50,11 @@ public class TicketService {
         ticketRepo.persist(ticketEntity);
     }
 
+    @Transactional
     public void redeemTicket(String ticketId) {
         Ticket ticket = ticketRepo.findById(ticketId);
         if(ticket.getStatus() == TicketStatus.VALID) {
             ticket.setStatus(TicketStatus.REDEEMED);
-            ticketRepo.persist(ticket);
             return;
         }
         throw new BadRequestException(Response.ok("invalid_ticket_status").status(400).build());
