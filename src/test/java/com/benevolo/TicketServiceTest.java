@@ -112,7 +112,7 @@ public class TicketServiceTest {
                     .then()
                     .statusCode(204);
 
-            Assert.equals(2, ticketRepo.list("status", TicketStatus.REDEEMED).size());
+            Assert.equals(TicketStatus.REDEEMED, ticketRepo.findById(ticket.getId()).getStatus());
         }
         {
             Ticket ticket = ticketRepo.list("status", TicketStatus.REDEEMED).getFirst();
