@@ -101,7 +101,6 @@ public class TicketServiceTest {
         Assert.equals(40, ticketRepo.findById(ticket.getId()).getTaxRate());
     }
 
-    @Disabled
     @Test
     @Order(3)
     void testRedeemTicket() {

@@ -42,6 +42,7 @@ public class TicketService {
         return (long) Math.ceil((ticketRepo.countByEventId(eventId) * 1.0) / pageSize);
     }
 
+    @Transactional
     public void update(String ticketId, Ticket ticket) {
         Ticket ticketEntity = ticketRepo.findById(ticketId);
         ticketEntity.setStatus(ticket.getStatus());
@@ -50,6 +51,7 @@ public class TicketService {
         ticketRepo.persist(ticketEntity);
     }
 
+    @Transactional
     public void redeemTicket(String ticketId) {
         Ticket ticket = ticketRepo.findById(ticketId);
         if(ticket.getStatus() == TicketStatus.VALID) {
