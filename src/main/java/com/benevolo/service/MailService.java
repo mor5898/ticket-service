@@ -2,10 +2,11 @@ package com.benevolo.service;
 
 import io.quarkus.mailer.Mail;
 import io.quarkus.mailer.Mailer;
-import io.smallrye.common.annotation.Blocking;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.apache.pdfbox.pdmodel.PDDocument;
 
+@ApplicationScoped
 public class MailService {
 
     private final Mailer mailer;
@@ -15,7 +16,6 @@ public class MailService {
         this.mailer = mailer;
     }
 
-    @Blocking // not sure about this?
     public void sendEmail(PDDocument pdf) {
         // to do
         mailer.send(

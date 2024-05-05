@@ -7,11 +7,6 @@ import io.vertx.core.http.HttpServerResponse;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.inject.Inject;
-
-import java.io.IOException;
-import java.sql.SQLException;
-
-import com.google.zxing.WriterException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 
 @Path("/mail")
@@ -41,18 +36,14 @@ public class MailResource {
         try {
             byte[] qrCode = qrCodeService.generateQRCode(ticketId);
             if (qrCode == null) {
-                httpServerResponse.setStatusCode(404).end("No Ticket found for id:" + ticketId);
+                httpServerResponse.setStatusCode(404).end("No Ticket found for id: " + ticketId);
                 return;
             }
             PDDocument pdf = pdfService.createPdf(qrCode);
             mailService.sendEmail(pdf);
             httpServerResponse.setStatusCode(201).end("Ticket successfully send.");
-        } catch (SQLException e) { // to do: error handling
-            throw new RuntimeException(e);
-        } catch (WriterException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            httpServerResponse.setStatusCode(500).end("Server Error: " + e);
         }
     }
 }

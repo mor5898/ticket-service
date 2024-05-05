@@ -1,5 +1,6 @@
 package com.benevolo.service;
 
+import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -9,6 +10,7 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import java.io.File;
 import java.io.IOException;
 
+@ApplicationScoped
 public class PdfService {
 
     public PDDocument createPdf(byte[] qrCode) {
