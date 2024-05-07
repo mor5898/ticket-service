@@ -15,6 +15,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @ApplicationScoped
@@ -29,6 +30,7 @@ public class QrCodeService {
 
     public byte[] generateQRCode(String ticketId) throws SQLException, WriterException, IOException {
         Ticket ticket = ticketRepo.findById(ticketId);
+        List<Ticket> list = ticketRepo.listAll();
         if (ticket != null) {
             Map<String, Object> qrData = new HashMap<>();
             qrData.put("ticket_id", ticketId);
