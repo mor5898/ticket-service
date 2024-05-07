@@ -78,6 +78,7 @@ public class TicketServiceTest {
         Assert.equals(1, bookingRepo.listAll().size());
         Assert.equals(2, bookingItemRepo.listAll().size());
         Assert.equals(5, ticketRepo.listAll().size());
+        Assert.equals(6, ticketRepo.listAll().getFirst().getPublicId().length());
     }
 
     @Test
@@ -100,8 +101,36 @@ public class TicketServiceTest {
         Assert.equals(40, ticketRepo.findById(ticket.getId()).getTaxRate());
     }
 
+    @Disabled
     @Test
     @Order(3)
+    void testRedeemTicket() {
+        {
+            Ticket ticket = ticketRepo.list("status", TicketStatus.VALID).getFirst();
+
+            given().when()
+                    .patch("/tickets/" + ticket.getId() + "/status")
+                    .then()
+                    .statusCode(204);
+
+            Assert.equals(TicketStatus.REDEEMED, ticketRepo.findById(ticket.getId()).getStatus());
+        }
+        {
+            Ticket ticket = ticketRepo.list("status", TicketStatus.REDEEMED).getFirst();
+
+            given().when()
+                    .patch("/tickets/" + ticket.getId() + "/status")
+                    .then()
+                    .statusCode(400);
+
+            Assert.equals(TicketStatus.REDEEMED, ticketRepo.findById(ticket.getId()).getStatus());
+        }
+    }
+
+
+
+    @Test
+    @Order(4)
     void testGetTickets() throws JsonProcessingException {
         {
             Map<String, String> expectedHeaders = new HashMap<>();

@@ -3,8 +3,12 @@ package com.benevolo.resource;
 import com.benevolo.entity.Booking;
 import com.benevolo.entity.Ticket;
 import com.benevolo.service.TicketService;
+import com.benevolo.utils.TicketStatus;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.vertx.core.http.HttpServerResponse;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 
@@ -36,6 +40,14 @@ public class TicketResource {
     @Produces(MediaType.APPLICATION_JSON)
     public void put(@PathParam("ticketId") String ticketId, Ticket ticket) {
         ticketService.update(ticketId, ticket);
+    }
+
+    @PATCH
+    @Path("/tickets/{ticketId}/status")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public void updateStatusByTicketId(@PathParam("ticketId") String ticketId) {
+        ticketService.redeemTicket(ticketId);
     }
 
     @GET

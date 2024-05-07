@@ -39,7 +39,7 @@ CREATE TABLE ticket (
     CONSTRAINT uq_public_id UNIQUE (id)
 );
 
-/*INSERT INTO customer(id, stripe_id, email)
+INSERT INTO customer(id, stripe_id, email)
 VALUES ('aa75b92f-510c-44de-9fa0-5523ba6d96c2', '849380', 'a.d@mail.de');
 
 INSERT INTO booking(id, event_id, booked_at, customer_id)
@@ -62,4 +62,4 @@ VALUES ('6375b92f-510c-44de-9fa0-5523ba6d96c2', '654927', 'VALID', 2000, 19, 'a4
        ('0375b92f-510c-44de-9fa0-5523ba6d96c2', '154927', 'CANCELLED', 2000, 19, '6379fd9f-a4d9-4828-a7a1-4bf89f36d0b6'),
        ('a375b92f-510c-44de-9fa0-5523ba6d96c2', '834927', 'CANCELLED', 2000, 19, '6379fd9f-a4d9-4828-a7a1-4bf89f36d0b6'),
        ('b375b92f-510c-44de-9fa0-5523ba6d96c2', '824927', 'CANCELLED', 2000, 19, '6379fd9f-a4d9-4828-a7a1-4bf89f36d0b6'),
-       ('c375b92f-510c-44de-9fa0-5523ba6d96c2', '894927', 'CANCELLED', 2000, 19, '6379fd9f-a4d9-4828-a7a1-4bf89f36d0b6');*/
+       ('c375b92f-510c-44de-9fa0-5523ba6d96c2', '894927', 'CANCELLED', 2000, 19, '6379fd9f-a4d9-4828-a7a1-4bf89f36d0b6');

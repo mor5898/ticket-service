@@ -7,6 +7,8 @@ import com.benevolo.utils.TicketStatus;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
@@ -40,6 +42,7 @@ public class TicketService {
         return (long) Math.ceil((ticketRepo.countByEventId(eventId) * 1.0) / pageSize);
     }
 
+    @Transactional
     public void update(String ticketId, Ticket ticket) {
         Ticket ticketEntity = ticketRepo.findById(ticketId);
         ticketEntity.setStatus(ticket.getStatus());
@@ -47,6 +50,17 @@ public class TicketService {
         ticketEntity.setTaxRate(ticket.getTaxRate());
         ticketRepo.persist(ticketEntity);
     }
+
+    @Transactional
+    public void redeemTicket(String ticketId) {
+        Ticket ticket = ticketRepo.findById(ticketId);
+        if(ticket.getStatus() == TicketStatus.VALID) {
+            ticket.setStatus(TicketStatus.REDEEMED);
+            return;
+        }
+        throw new BadRequestException(Response.ok("invalid_ticket_status").status(400).build());
+    }
+
 
     @Transactional
     public void save(Booking booking) {
@@ -65,6 +79,6 @@ public class TicketService {
 
     private Ticket generateTicket(BookingItem bookingItem) {
         TicketType ticketType = ticketTypeClient.findById(bookingItem.getTicketTypeId());
-        return new Ticket(TicketStatus.PENDING, ticketType.getPrice(), ticketType.getTaxRate());
+        return new Ticket(TicketStatus.VALID, ticketType.getPrice(), ticketType.getTaxRate());
     }
 }
