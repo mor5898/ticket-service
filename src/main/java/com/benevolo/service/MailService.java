@@ -18,6 +18,7 @@ public class MailService {
 
     public void sendEmail(PDDocument pdf) {
         // to do
+
         mailer.send(
                 Mail.withText("test@test.com",
                         "Ahoy from Quarkus",

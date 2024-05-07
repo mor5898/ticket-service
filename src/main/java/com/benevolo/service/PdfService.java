@@ -8,10 +8,12 @@ import com.benevolo.repo.BookingRepo;
 import com.google.zxing.WriterException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import org.apache.pdfbox.cos.COSArray;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
+import org.apache.pdfbox.pdmodel.graphics.color.PDColor;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
 import java.io.File;
@@ -32,7 +34,7 @@ public class PdfService {
         this.bookingRepo = bookingRepo;
     }
 
-    public PDDocument createPdf(String eventId, String eventName, String bookingId) throws SQLException, WriterException {
+    public PDDocument createPdf(String eventName, String eventId, String bookingId) throws SQLException, WriterException {
         try (PDDocument document = new PDDocument()) {
 
             PDType0Font font = PDType0Font.load(document, new File("font/Helvetica-Bold-Font.ttf"));
@@ -40,13 +42,19 @@ public class PdfService {
 
             Booking booking = bookingRepo.findById(bookingId);
             List<BookingItem> bookingItemList = booking.getBookingItems();
-            int count = 0;
+
             for (BookingItem item : bookingItemList) {
+                int count = 0;
                 List<Ticket> tickets = item.getTickets();
                 PDPage page = new PDPage();
                 document.addPage(page);
                 //TicketType ticketType = item.getTicketType();
                 for (Ticket ticket : tickets) {
+                    if (count >= 3) {
+                        page = new PDPage();
+                        document.addPage(page);
+                        count = 0;
+                    }
                     String ticketId = ticket.getId();
                     PDImageXObject qrCodeImage = PDImageXObject.createFromByteArray(document, qrCodeService.generateQRCode(ticketId), "qrCode");
                     float startY = 750 - (count * 250);
@@ -57,13 +65,11 @@ public class PdfService {
                             startY,
                             qrCodeImage,
                             eventName,
+                           eventId,
                            // ticketType.getName());
                             "Blabla");
-                    if (count >= 3) {
-                        page = new PDPage();
-                        document.addPage(page);
-                        count = 0;
-                    }
+                            count++;
+
                 }
             }
 
@@ -76,27 +82,58 @@ public class PdfService {
     }
 
     private static void drawTicket(PDDocument document, PDPage page, PDType0Font font, PDImageXObject image, float startY, PDImageXObject qrCode,
-                                   String eventName, String ticketTypeName) throws IOException {
+                                   String eventName, String eventId, String ticketTypeName) throws IOException {
         try (PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true)) {
-            // Festivalname
+
+            // Hintergrundbild für das Ticket
+            //PDImageXObject bgImage = PDImageXObject.createFromFile("img/_6de14522-d0db-464a-840b-853726a9bc7d.jpeg", document);
+            //contentStream.drawImage(bgImage, 0, startY, page.getMediaBox().getWidth(), page.getMediaBox().getHeight() / 3);
+
+            // QR-Code
+            contentStream.drawImage(qrCode, 500, startY - 80, 100, 100);
+
+            //FestivalId
             contentStream.beginText();
             contentStream.setFont(font, 12);
+            contentStream.newLineAtOffset(350, startY - 130);
+            contentStream.showText(eventId);
+            contentStream.endText();
+
+            // Festivalname links oben
+            contentStream.beginText();
+            contentStream.setFont(font, 22);
             contentStream.newLineAtOffset(50, startY);
             contentStream.showText(eventName);
             contentStream.endText();
 
-            // QR-Code
-            contentStream.drawImage(qrCode, 500, startY - 50, 50, 50);
+            // Ort des Festivals
+            contentStream.beginText();
+            contentStream.setFont(font, 16);
+            contentStream.newLineAtOffset(50, startY - 20);
+            contentStream.showText("Festivalort");
+            contentStream.endText();
+
+            // Datum und Uhrzeit
+            contentStream.beginText();
+            contentStream.setFont(font, 12);
+            contentStream.newLineAtOffset(50, startY - 40);
+            contentStream.showText("Freitag, 01.01.2001 20:00 Uhr");
+            contentStream.endText();
+
+            // Preis des Tickets
+            contentStream.beginText();
+            contentStream.setFont(font, 16);
+            contentStream.newLineAtOffset(50, startY -60);
+            contentStream.showText("Preis: 59,99EUR");
+            contentStream.endText();
 
             // Tickettyp
             contentStream.beginText();
             contentStream.setFont(font, 12);
-            contentStream.newLineAtOffset(500, startY - 60);
+            contentStream.newLineAtOffset(50, startY - 80);
             contentStream.showText(ticketTypeName);
             contentStream.endText();
 
-            // Bild in der Mitte des Tickets
-            contentStream.drawImage(image, 200, startY - 125, 100, 100);
         }
     }
 }
