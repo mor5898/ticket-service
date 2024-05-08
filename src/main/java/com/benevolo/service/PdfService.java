@@ -82,7 +82,6 @@ public class PdfService {
                 List<Ticket> tickets = item.getTickets();
                 PDPage page = new PDPage();
                 document.addPage(page);
-                //TicketType ticketType = item.getTicketType();
                 for (Ticket ticket : tickets) {
                     if (count >= 3) {
                         page = new PDPage();
@@ -126,9 +125,6 @@ public class PdfService {
             // Hintergrundbild für das Ticket
             PDImageXObject bgImage = PDImageXObject.createFromFile("img/AdobeStock_456815540_Preview.jpeg", document);
             contentStream.drawImage(bgImage, 0, startY - 240, PDRectangle.A4.getWidth(), 265);
-
-            //PDImageXObject bgImage = PDImageXObject.createFromFile("img/_6de14522-d0db-464a-840b-853726a9bc7d.jpeg", document);
-            //contentStream.drawImage(bgImage, 0, startY, PDRectangle.A4.getWidth(), PDRectangle.A4.getHeight()/3 );
 
             // QR-Code
             contentStream.drawImage(qrCode, 500, startY - 80, 100, 100);
