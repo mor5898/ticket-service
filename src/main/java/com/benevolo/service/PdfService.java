@@ -5,6 +5,8 @@ import com.benevolo.entity.BookingItem;
 import com.benevolo.entity.Ticket;
 import com.benevolo.entity.TicketType;
 import com.benevolo.repo.BookingRepo;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.zxing.WriterException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -19,6 +21,10 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -28,15 +34,21 @@ public class PdfService {
     private final QrCodeService qrCodeService;
 
     private final BookingRepo bookingRepo;
-
+    @Inject
+    TicketService ticketService;
     @Inject
     public PdfService(QrCodeService qrCodeService, BookingRepo bookingRepo) {
         this.qrCodeService = qrCodeService;
         this.bookingRepo = bookingRepo;
     }
 
-    public PDDocument createPdf(String eventName, String eventId, String bookingId) throws SQLException, WriterException {
+    public PDDocument createPdf(String eventNameP, String eventId, String bookingId) throws SQLException, WriterException {
         try (PDDocument document = new PDDocument()) {
+
+            String ticketType = "";
+            String validFrom ="";
+            String eventName ="";
+            String location ="";
 
             PDType0Font font = PDType0Font.load(document, new File("font/Helvetica-Bold-Font.ttf"));
             PDImageXObject image = PDImageXObject.createFromFile("img/csm_limestone-festival-2020-1_9610915071.jpg", document);
@@ -45,6 +57,27 @@ public class PdfService {
             List<BookingItem> bookingItemList = booking.getBookingItems();
 
             for (BookingItem item : bookingItemList) {
+                try {
+                    String ticketTypeId = item.getTicketTypeId();
+                    HttpClient client = HttpClient.newHttpClient();
+                    HttpRequest request = HttpRequest.newBuilder()
+                            .uri(new URI("http://localhost:8080/api/event-service/ticket-types/" + ticketTypeId))
+                            .GET()
+                            .build();
+
+                    HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+                    ObjectMapper mapper = new ObjectMapper();
+                    JsonNode requestData = mapper.readTree(response.body());
+
+                    ticketType = requestData.get("name").asText();
+                    validFrom = requestData.get("validFrom").asText();
+                    eventName = requestData.path("event").path("eventName").asText();
+                    location = requestData.path("event").path("address").path("city").asText();
+                    //System.out.println("API Response: " + response.body());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 int count = 0;
                 List<Ticket> tickets = item.getTickets();
                 PDPage page = new PDPage();
@@ -59,6 +92,7 @@ public class PdfService {
                     String ticketId = ticket.getId();
                     PDImageXObject qrCodeImage = PDImageXObject.createFromByteArray(document, qrCodeService.generateQRCode(ticketId), "qrCode");
                     float startY = 750 - (count * 250);
+
                     drawTicket(document,
                             page,
                             font,
@@ -69,8 +103,9 @@ public class PdfService {
                            eventId,
                            ticket.getPrice(),
                            ticket.getId(),
-                           //ticketType.getName());
-                            "Blabla");
+                           ticketType,
+                            validFrom,
+                            location);
                             count++;
 
                 }
@@ -85,7 +120,7 @@ public class PdfService {
     }
 
     private static void drawTicket(PDDocument document, PDPage page, PDType0Font font, PDImageXObject image, float startY, PDImageXObject qrCode,
-                                   String eventName, String eventId, int price, String ticketId, String ticketTypeName) throws IOException {
+                                   String eventName, String eventId, int price, String ticketId, String ticketTypeName, String validFrom, String location) throws IOException {
         try (PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true)) {
 
             // Hintergrundbild für das Ticket
@@ -116,14 +151,7 @@ public class PdfService {
             contentStream.beginText();
             contentStream.setFont(font, 16);
             contentStream.newLineAtOffset(27, startY - 20);
-            contentStream.showText("Festivalort");
-            contentStream.endText();
-
-            // Datum und Uhrzeit
-            contentStream.beginText();
-            contentStream.setFont(font, 12);
-            contentStream.newLineAtOffset(27, startY - 40);
-            contentStream.showText("Freitag, 01.01.2001 20:00 Uhr");
+            contentStream.showText(location);
             contentStream.endText();
 
             // Preis des Tickets
@@ -138,6 +166,13 @@ public class PdfService {
             contentStream.setFont(font, 12);
             contentStream.newLineAtOffset(27, startY - 80);
             contentStream.showText(ticketTypeName);
+            contentStream.endText();
+
+            // EventStart
+            contentStream.beginText();
+            contentStream.setFont(font, 12);
+            contentStream.newLineAtOffset(27, startY - 100);
+            contentStream.showText(validFrom);
             contentStream.endText();
 
         }
