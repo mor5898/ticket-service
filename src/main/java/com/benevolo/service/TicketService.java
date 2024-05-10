@@ -2,19 +2,21 @@ package com.benevolo.service;
 
 import com.benevolo.client.TicketTypeClient;
 import com.benevolo.entity.*;
+import com.benevolo.repo.BookingRepo;
 import com.benevolo.repo.TicketRepo;
 import com.benevolo.utils.TicketStatus;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.core.Response;
-import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 @ApplicationScoped
 public class TicketService {
@@ -23,10 +25,12 @@ public class TicketService {
     TicketTypeClient ticketTypeClient;
 
     private final TicketRepo ticketRepo;
+    private final BookingRepo bookingRepo;
 
     @Inject
-    public TicketService(TicketRepo ticketRepo) {
+    public TicketService(TicketRepo ticketRepo, BookingRepo bookingRepo) {
         this.ticketRepo = ticketRepo;
+        this.bookingRepo = bookingRepo;
     }
 
     public List<Ticket> findByEventId(String eventId, Integer pageIndex, Integer pageSize) {
@@ -80,5 +84,32 @@ public class TicketService {
     private Ticket generateTicket(BookingItem bookingItem) {
         TicketType ticketType = ticketTypeClient.findById(bookingItem.getTicketTypeId());
         return new Ticket(TicketStatus.VALID, ticketType.getPrice(), ticketType.getTaxRate());
+    }
+
+    public List<ObjectNode> getStatsbyWeek(String eventId, String startDate, String endDate) {
+        return null;
+    }
+
+    public List<ObjectNode> getStatsByDay(String eventId, String startDate, String endDate) {
+        LocalDate start =  LocalDate.parse(startDate);
+        LocalDate end = LocalDate.parse(endDate);
+
+        List<LocalDate> dates = start.datesUntil(end).toList();
+        ObjectMapper mapper = new ObjectMapper();
+        List<ObjectNode> statsByDate = new LinkedList<>();
+
+        for(LocalDate date : dates) {
+            Long countBookings = bookingRepo.countByDate(eventId, date);
+            Long countTickets = ticketRepo.countByDate(eventId, date);
+
+            ObjectNode node = mapper.createObjectNode();
+            node.put("label", date.toString());
+            node.putObject("data")
+                    .put("orders", countBookings)
+                    .put("ticketsSold", countTickets);
+
+            statsByDate.add(node);
+        }
+        return statsByDate;
     }
 }
