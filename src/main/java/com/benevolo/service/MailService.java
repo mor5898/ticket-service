@@ -24,7 +24,6 @@ public class MailService {
     Customer customer = new Customer();
 
     public void sendEmail(PDDocument pdf) {
-        // to do
 
         mailer.send(
                 Mail.withText(customer.getEmail(),

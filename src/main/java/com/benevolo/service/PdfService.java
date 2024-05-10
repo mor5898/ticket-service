@@ -1,31 +1,26 @@
 package com.benevolo.service;
 
+import com.benevolo.client.TicketTypeClient;
 import com.benevolo.entity.Booking;
 import com.benevolo.entity.BookingItem;
 import com.benevolo.entity.Ticket;
 import com.benevolo.entity.TicketType;
 import com.benevolo.repo.BookingRepo;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.zxing.WriterException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import org.apache.pdfbox.cos.COSArray;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
-import org.apache.pdfbox.pdmodel.graphics.color.PDColor;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.sql.SQLException;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @ApplicationScoped
@@ -34,21 +29,25 @@ public class PdfService {
     private final QrCodeService qrCodeService;
 
     private final BookingRepo bookingRepo;
-    @Inject
-    TicketService ticketService;
+
+    @RestClient
+    TicketTypeClient ticketTypeClient;
+
     @Inject
     public PdfService(QrCodeService qrCodeService, BookingRepo bookingRepo) {
         this.qrCodeService = qrCodeService;
         this.bookingRepo = bookingRepo;
     }
 
-    public PDDocument createPdf(String eventNameP, String eventId, String bookingId) throws SQLException, WriterException {
+    public PDDocument createPdf(String eventId, String bookingId) throws SQLException, WriterException {
         try (PDDocument document = new PDDocument()) {
 
-            String ticketType = "";
-            String validFrom ="";
-            String eventName ="";
-            String location ="";
+            String ticketTypeName = "";
+            String validFrom = "";
+            String validTo = "";
+            String eventName = "";
+            String location = "";
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
             PDType0Font font = PDType0Font.load(document, new File("font/Helvetica-Bold-Font.ttf"));
             PDImageXObject image = PDImageXObject.createFromFile("img/csm_limestone-festival-2020-1_9610915071.jpg", document);
@@ -57,27 +56,14 @@ public class PdfService {
             List<BookingItem> bookingItemList = booking.getBookingItems();
 
             for (BookingItem item : bookingItemList) {
-                try {
-                    String ticketTypeId = item.getTicketTypeId();
-                    HttpClient client = HttpClient.newHttpClient();
-                    HttpRequest request = HttpRequest.newBuilder()
-                            .uri(new URI("http://localhost:8080/api/event-service/ticket-types/" + ticketTypeId))
-                            .GET()
-                            .build();
+                String ticketTypeId = item.getTicketTypeId();
+                TicketType ticketType = ticketTypeClient.findById(ticketTypeId);
+                ticketTypeName = ticketType.getName();
+                validFrom = formatter.format(ticketType.getValidFrom());
+                validTo = formatter.format(ticketType.getValidTo());
+                eventName = ticketType.getEvent().getEventName();
+                location = ticketType.getEvent().getAddress().getCity();
 
-                    HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-                    ObjectMapper mapper = new ObjectMapper();
-                    JsonNode requestData = mapper.readTree(response.body());
-
-                    ticketType = requestData.get("name").asText();
-                    validFrom = requestData.get("validFrom").asText();
-                    eventName = requestData.path("event").path("eventName").asText();
-                    location = requestData.path("event").path("address").path("city").asText();
-                    //System.out.println("API Response: " + response.body());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
                 int count = 0;
                 List<Ticket> tickets = item.getTickets();
                 PDPage page = new PDPage();
@@ -99,27 +85,26 @@ public class PdfService {
                             startY,
                             qrCodeImage,
                             eventName,
-                           eventId,
-                           ticket.getPrice(),
-                           ticket.getId(),
-                           ticketType,
+                            ticket.getPrice(),
+                            ticket.getId(),
+                            ticketTypeName,
                             validFrom,
-                            location);
-                            count++;
+                            location,
+                            validTo);
+                    count++;
 
                 }
             }
 
-            document.save("ticketExample\\FestivalTickets.pdf"); // necessary?
+            //document.save("ticketExample\\FestivalTickets.pdf"); // only for testing, needs to be removed for production
             return document;
         } catch (IOException e) {
-            e.printStackTrace();
             return null;
         }
     }
 
     private static void drawTicket(PDDocument document, PDPage page, PDType0Font font, PDImageXObject image, float startY, PDImageXObject qrCode,
-                                   String eventName, String eventId, int price, String ticketId, String ticketTypeName, String validFrom, String location) throws IOException {
+                                   String eventName, int price, String ticketId, String ticketTypeName, String validFrom, String location, String validTo) throws IOException {
         try (PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true)) {
 
             // Hintergrundbild für das Ticket
@@ -129,7 +114,7 @@ public class PdfService {
             // QR-Code
             contentStream.drawImage(qrCode, 500, startY - 80, 100, 100);
 
-            //FestivalId
+            //TicketId
             contentStream.beginText();
             contentStream.setFont(font, 12);
             contentStream.newLineAtOffset(350, startY - 200);
@@ -153,7 +138,7 @@ public class PdfService {
             // Preis des Tickets
             contentStream.beginText();
             contentStream.setFont(font, 16);
-            contentStream.newLineAtOffset(27, startY -60);
+            contentStream.newLineAtOffset(27, startY - 60);
             contentStream.showText(String.valueOf(price) + " EUR");
             contentStream.endText();
 
@@ -164,13 +149,12 @@ public class PdfService {
             contentStream.showText(ticketTypeName);
             contentStream.endText();
 
-            // EventStart
+            // Gülitigkeitsdatum Ticket
             contentStream.beginText();
             contentStream.setFont(font, 12);
             contentStream.newLineAtOffset(27, startY - 100);
-            contentStream.showText(validFrom);
+            contentStream.showText(validFrom + " - " + validTo);
             contentStream.endText();
-
         }
     }
 }

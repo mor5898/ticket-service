@@ -1,20 +1,28 @@
 package com.benevolo.entity;
 
+import java.time.LocalDateTime;
+
 public class TicketType {
 
     private String id;
     private int price;
     private int taxRate;
     private String name;
+    private LocalDateTime validFrom;
+    private LocalDateTime validTo;
+    private Event event;
 
     public TicketType() {
     }
 
-    public TicketType(String id, int price, int taxRate, String name) {
+    public TicketType(String id, int price, int taxRate, String name, LocalDateTime validFrom, LocalDateTime validTo, Event event) {
         this.id = id;
         this.price = price;
         this.taxRate = taxRate;
         this.name = name;
+        this.validFrom = validFrom;
+        this.validTo = validTo;
+        this.event = event;
     }
 
     public String getId() {
@@ -47,5 +55,29 @@ public class TicketType {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setValidFrom(LocalDateTime validFrom) {
+        this.validFrom = validFrom;
+    }
+
+    public void setValidTo(LocalDateTime validTo) {
+        this.validTo = validTo;
+    }
+
+    public LocalDateTime getValidFrom() {
+        return validFrom;
+    }
+
+    public LocalDateTime getValidTo() {
+        return validTo;
+    }
+
+    public Event getEvent() {
+        return event;
+    }
+
+    public void setEvent(Event event) {
+        this.event = event;
     }
 }
