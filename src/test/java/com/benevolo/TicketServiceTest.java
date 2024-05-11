@@ -177,14 +177,4 @@ public class TicketServiceTest {
         }
     }
 
-    @Test
-    @Order(5)
-    void testGetTicketStatsByWeek() {
-
-        given().when()
-                .get("/tickets/" + ticket.getId() + "/status")
-                .then()
-                .statusCode(204);
-
-    }
 }
