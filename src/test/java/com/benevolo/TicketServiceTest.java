@@ -176,4 +176,15 @@ public class TicketServiceTest {
             Assert.equals(1, tickets.size());
         }
     }
+
+    @Test
+    @Order(5)
+    void testGetTicketStatsByWeek() {
+
+        given().when()
+                .get("/tickets/" + ticket.getId() + "/status")
+                .then()
+                .statusCode(204);
+
+    }
 }

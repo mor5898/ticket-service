@@ -64,10 +64,17 @@ public class TicketResource {
     }
 
     @GET
-    @Path("/tickets/{eventId}/statsbyday/{startDate}/{endDate}")
+    @Path("/tickets/{eventId}/ticketstatsbyday/{startDate}/{endDate}")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<ObjectNode> getStatsByDay(@PathParam("eventId") String eventId, @PathParam("startDate") String startDate, @PathParam("endDate") String endDate){
-        return ticketService.getStatsByDay(eventId, startDate, endDate);
+    public List<ObjectNode> getTicketStatsByDay(@PathParam("eventId") String eventId, @PathParam("startDate") String startDate, @PathParam("endDate") String endDate){
+        return ticketService.getTicketStatsByDay(eventId, startDate, endDate);
+    }
+
+    @GET
+    @Path("/tickets/{eventId}/bookingstatsbyday/{startDate}/{endDate}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<ObjectNode> getBookingStatsByDay(@PathParam("eventId") String eventId, @PathParam("startDate") String startDate, @PathParam("endDate") String endDate){
+        return ticketService.getBookingStatsByDay(eventId, startDate, endDate);
     }
 
 }
