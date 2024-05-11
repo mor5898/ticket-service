@@ -128,21 +128,4 @@ public class TicketService {
         }
         return statsByDate;
     }
-    public List<ObjectNode> getBookingStatsByWeek(String eventId, String startDate, String endDate) {
-        LocalDate start =  LocalDate.parse(startDate);
-        LocalDate end = LocalDate.parse(endDate).plusDays(1);
-
-        List<LocalDate> dates = start.datesUntil(end).toList();
-        ObjectMapper mapper = new ObjectMapper();
-        List<ObjectNode> statsByDate = new LinkedList<>();
-
-        for(LocalDate date : dates) {
-            Long countBookings = bookingRepo.countByDate(eventId, date);
-            ObjectNode node = mapper.createObjectNode();
-            node.put("label", date.toString());
-            node.put("data", countBookings);
-            statsByDate.add(node);
-        }
-        return statsByDate;
-    }
 }
