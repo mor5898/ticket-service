@@ -2,12 +2,13 @@ package com.benevolo.service;
 
 import com.benevolo.DTO.StatsDTO;
 import com.benevolo.client.TicketTypeClient;
-import com.benevolo.entity.*;
+import com.benevolo.entity.Booking;
+import com.benevolo.entity.BookingItem;
+import com.benevolo.entity.Ticket;
+import com.benevolo.entity.TicketType;
 import com.benevolo.repo.BookingRepo;
 import com.benevolo.repo.TicketRepo;
 import com.benevolo.utils.TicketStatus;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -17,7 +18,8 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
 
 @ApplicationScoped
 public class TicketService {
@@ -59,7 +61,7 @@ public class TicketService {
     @Transactional
     public void redeemTicket(String ticketId) {
         Ticket ticket = ticketRepo.findById(ticketId);
-        if(ticket.getStatus() == TicketStatus.VALID) {
+        if (ticket.getStatus() == TicketStatus.VALID) {
             ticket.setStatus(TicketStatus.REDEEMED);
             return;
         }
@@ -69,12 +71,12 @@ public class TicketService {
 
     @Transactional
     public void save(Booking booking) {
-        for(BookingItem bookingItem : booking.getBookingItems()) {
+        for (BookingItem bookingItem : booking.getBookingItems()) {
             bookingItem.setBooking(booking);
             booking.setBookedAt(LocalDateTime.now());
             bookingItem.setTicketType(ticketTypeClient.findById(bookingItem.getTicketTypeId()));
             bookingItem.setTickets(new LinkedList<>());
-            for(int i = 0; i < bookingItem.getQuantity(); i++) {
+            for (int i = 0; i < bookingItem.getQuantity(); i++) {
                 bookingItem.addTicket(generateTicket(bookingItem));
             }
         }
@@ -87,29 +89,28 @@ public class TicketService {
         return new Ticket(TicketStatus.VALID, ticketType.getPrice(), ticketType.getTaxRate());
     }
 
-    public List<StatsDTO> getTicketStatsByDay(String eventId, String startDate, String endDate) {
-        LocalDate start =  LocalDate.parse(startDate);
+    public synchronized List<StatsDTO> getTicketStatsByDay(String eventId, String startDate, String endDate) {
+        LocalDate start = LocalDate.parse(startDate);
         LocalDate end = LocalDate.parse(endDate).plusDays(1);
 
         List<LocalDate> dates = start.datesUntil(end).toList();
         List<StatsDTO> statsByDate = new LinkedList<>();
 
-        for(LocalDate date : dates) {
+        for (LocalDate date : dates) {
             long countTickets = ticketRepo.countByDate(eventId, date);
             statsByDate.add(new StatsDTO(date.toString(), countTickets));
         }
         return statsByDate;
     }
 
-
-    public List<StatsDTO> getBookingStatsByDay(String eventId, String startDate, String endDate) {
-        LocalDate start =  LocalDate.parse(startDate);
+    public synchronized List<StatsDTO> getBookingStatsByDay(String eventId, String startDate, String endDate) {
+        LocalDate start = LocalDate.parse(startDate);
         LocalDate end = LocalDate.parse(endDate).plusDays(1);
 
         List<LocalDate> dates = start.datesUntil(end).toList();
         List<StatsDTO> statsByDate = new LinkedList<>();
 
-        for(LocalDate date : dates) {
+        for (LocalDate date : dates) {
             long countBookings = bookingRepo.countByDate(eventId, date);
             statsByDate.add(new StatsDTO(date.toString(), countBookings));
         }
