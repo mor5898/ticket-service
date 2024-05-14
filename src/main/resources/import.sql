@@ -43,7 +43,7 @@ INSERT INTO customer(id, stripe_id, email)
 VALUES ('aa75b92f-510c-44de-9fa0-5523ba6d96c2', '849380', 'a.d@mail.de');
 
 INSERT INTO booking(id, event_id, booked_at, customer_id)
-VALUES ('377f870c-5a29-46e4-ac86-706c0ff00dc2', '383f700f-5449-4e40-b509-bee0b5d139d6', '2024-04-18 10:34:12', 'aa75b92f-510c-44de-9fa0-5523ba6d96c2');
+VALUES ('377f870c-5a29-46e4-ac86-706c0ff00dc2', '383f700f-5449-4e40-b509-bee0b5d139d6', '2024-05-12 10:34:12', 'aa75b92f-510c-44de-9fa0-5523ba6d96c2');
 
 INSERT INTO booking_item(id, quantity, ticket_type_id, booking_id)
 VALUES ('a4a83ecc-098c-445f-9d94-0c98b5c3de0b', 3, '223f700f-5449-4e40-b509-bee0b5d139d6', '377f870c-5a29-46e4-ac86-706c0ff00dc2'),

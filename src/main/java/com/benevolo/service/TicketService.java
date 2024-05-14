@@ -103,8 +103,8 @@ public class TicketService {
             Long countTickets = ticketRepo.countByDate(eventId, date);
 
             ObjectNode node = mapper.createObjectNode();
-            node.put("label", date.toString());
-            node.put("data", countTickets);
+            node.put("occurringDate", date.toString());
+            node.put("value", countTickets);
 
             statsByDate.add(node);
         }
@@ -122,8 +122,8 @@ public class TicketService {
         for(LocalDate date : dates) {
             Long countBookings = bookingRepo.countByDate(eventId, date);
             ObjectNode node = mapper.createObjectNode();
-            node.put("label", date.toString());
-            node.put("data", countBookings);
+            node.put("occurringDate", date.toString());
+            node.put("value", countBookings);
             statsByDate.add(node);
         }
         return statsByDate;
