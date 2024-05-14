@@ -11,7 +11,7 @@ import java.time.LocalDate;
 public class BookingRepo implements PanacheRepositoryBase<Booking, String> {
 
     public long countByDate(String eventId, LocalDate date) {
-        return count("SELECT COUNT(*) FROM Booking AS b WHERE b.eventId = :eventId AND DATE(b.bookedAt) = :date",
+        return count("SELECT COUNT(b) FROM Booking AS b WHERE b.eventId = :eventId AND DATE(b.bookedAt) = :date",
                 Parameters.with("eventId", eventId).and("date", date));
     }
 }

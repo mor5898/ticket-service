@@ -1,5 +1,6 @@
 package com.benevolo.resource;
 
+import com.benevolo.DTO.StatsDTO;
 import com.benevolo.entity.Booking;
 import com.benevolo.entity.Ticket;
 import com.benevolo.service.TicketService;
@@ -58,14 +59,14 @@ public class TicketResource {
     @GET
     @Path("/events/{eventId}/ticketstatsbyday/{startDate}/{endDate}")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<ObjectNode> getTicketStatsByDay(@PathParam("eventId") String eventId, @PathParam("startDate") String startDate, @PathParam("endDate") String endDate){
+    public List<StatsDTO> getTicketStatsByDay(@PathParam("eventId") String eventId, @PathParam("startDate") String startDate, @PathParam("endDate") String endDate){
         return ticketService.getTicketStatsByDay(eventId, startDate, endDate);
     }
 
     @GET
     @Path("/events/{eventId}/bookingstatsbyday/{startDate}/{endDate}")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<ObjectNode> getBookingStatsByDay(@PathParam("eventId") String eventId, @PathParam("startDate") String startDate, @PathParam("endDate") String endDate){
+    public List<StatsDTO> getBookingStatsByDay(@PathParam("eventId") String eventId, @PathParam("startDate") String startDate, @PathParam("endDate") String endDate){
         return ticketService.getBookingStatsByDay(eventId, startDate, endDate);
     }
 

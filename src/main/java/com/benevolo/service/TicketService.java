@@ -1,5 +1,6 @@
 package com.benevolo.service;
 
+import com.benevolo.DTO.StatsDTO;
 import com.benevolo.client.TicketTypeClient;
 import com.benevolo.entity.*;
 import com.benevolo.repo.BookingRepo;
@@ -86,45 +87,31 @@ public class TicketService {
         return new Ticket(TicketStatus.VALID, ticketType.getPrice(), ticketType.getTaxRate());
     }
 
-    public List<ObjectNode> getStatsbyWeek(String eventId, String startDate, String endDate) {
-        return null;
-    }
-
-    public List<ObjectNode> getTicketStatsByDay(String eventId, String startDate, String endDate) {
+    public List<StatsDTO> getTicketStatsByDay(String eventId, String startDate, String endDate) {
         LocalDate start =  LocalDate.parse(startDate);
         LocalDate end = LocalDate.parse(endDate).plusDays(1);
 
         List<LocalDate> dates = start.datesUntil(end).toList();
-        ObjectMapper mapper = new ObjectMapper();
-        List<ObjectNode> statsByDate = new LinkedList<>();
+        List<StatsDTO> statsByDate = new LinkedList<>();
 
         for(LocalDate date : dates) {
-            Long countBookings = bookingRepo.countByDate(eventId, date);
-            Long countTickets = ticketRepo.countByDate(eventId, date);
-
-            ObjectNode node = mapper.createObjectNode();
-            node.put("occurringDate", date.toString());
-            node.put("value", countTickets);
-
-            statsByDate.add(node);
+            long countTickets = ticketRepo.countByDate(eventId, date);
+            statsByDate.add(new StatsDTO(date.toString(), countTickets));
         }
         return statsByDate;
     }
 
-    public List<ObjectNode> getBookingStatsByDay(String eventId, String startDate, String endDate) {
+
+    public List<StatsDTO> getBookingStatsByDay(String eventId, String startDate, String endDate) {
         LocalDate start =  LocalDate.parse(startDate);
         LocalDate end = LocalDate.parse(endDate).plusDays(1);
 
         List<LocalDate> dates = start.datesUntil(end).toList();
-        ObjectMapper mapper = new ObjectMapper();
-        List<ObjectNode> statsByDate = new LinkedList<>();
+        List<StatsDTO> statsByDate = new LinkedList<>();
 
         for(LocalDate date : dates) {
-            Long countBookings = bookingRepo.countByDate(eventId, date);
-            ObjectNode node = mapper.createObjectNode();
-            node.put("occurringDate", date.toString());
-            node.put("value", countBookings);
-            statsByDate.add(node);
+            long countBookings = bookingRepo.countByDate(eventId, date);
+            statsByDate.add(new StatsDTO(date.toString(), countBookings));
         }
         return statsByDate;
     }

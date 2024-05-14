@@ -23,7 +23,7 @@ public class TicketRepo implements PanacheRepositoryBase<Ticket, String> {
     }
 
     public long countByDate(String eventId, LocalDate date) {
-        return count("SELECT COUNT(t) FROM Ticket AS t, BookingItem AS bi, Booking AS b WHERE t.bookingItem = bi AND bi.booking = b AND b.eventId = :eventId AND DATE(b.bookedAt) = :date",
+        return count("SELECT COUNT(*) FROM Ticket AS t, BookingItem AS bi, Booking AS b WHERE t.bookingItem = bi AND bi.booking = b AND b.eventId = :eventId AND DATE(b.bookedAt) = :date",
                 Parameters.with("eventId", eventId).and("date", date));
     }
 
