@@ -1,14 +1,12 @@
 package com.benevolo.resource;
 
+import com.benevolo.DTO.StatsDTO;
 import com.benevolo.entity.Booking;
 import com.benevolo.entity.Ticket;
 import com.benevolo.service.TicketService;
-import com.benevolo.utils.TicketStatus;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.vertx.core.http.HttpServerResponse;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 
@@ -56,6 +54,20 @@ public class TicketResource {
     public List<Ticket> get(@PathParam("eventId") String id, @PathParam("pageIndex") Integer pageIndex, @PathParam("pageSize") Integer pageSize) {
         httpServerResponse.headers().add("X-Page-Size", String.valueOf(ticketService.countByEventId(id, pageSize)));
         return ticketService.findByEventId(id, pageIndex, pageSize);
+    }
+
+    @GET
+    @Path("/events/{eventId}/ticketstatsbyday/{startDate}/{endDate}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<StatsDTO> getTicketStatsByDay(@PathParam("eventId") String eventId, @PathParam("startDate") String startDate, @PathParam("endDate") String endDate){
+        return ticketService.getTicketStatsByDay(eventId, startDate, endDate);
+    }
+
+    @GET
+    @Path("/events/{eventId}/bookingstatsbyday/{startDate}/{endDate}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<StatsDTO> getBookingStatsByDay(@PathParam("eventId") String eventId, @PathParam("startDate") String startDate, @PathParam("endDate") String endDate){
+        return ticketService.getBookingStatsByDay(eventId, startDate, endDate);
     }
 
 }
