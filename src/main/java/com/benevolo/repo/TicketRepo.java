@@ -7,6 +7,10 @@ import io.quarkus.panache.common.Parameters;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.Query;
 
+import jakarta.persistence.FlushModeType;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -27,17 +31,19 @@ public class TicketRepo implements PanacheRepositoryBase<Ticket, String> {
     }
 
 
-    public synchronized long countByStatus(String eventId, TicketStatus status) {
+    public synchronized long countByStatus2(String eventId, TicketStatus status) {
         return count("SELECT COUNT(*) FROM Ticket AS t, BookingItem AS bi, Booking AS b WHERE t.bookingItem = bi AND bi.booking = b AND b.eventId = :eventId AND t.status = :status",
                 Parameters.with("eventId", eventId).and("status", status));
     }
 
-    public synchronized long countByStatus2(String eventId, TicketStatus status) {
+    @Cache(usage = CacheConcurrencyStrategy.NONE)
+    public synchronized long countByStatus(String eventId, TicketStatus status) {
         Query query = getEntityManager().createQuery("SELECT COUNT(t) FROM Ticket AS t, " +
                 "BookingItem AS bi, Booking AS b WHERE t.bookingItem = bi AND bi.booking = b AND b.eventId = :eventId " +
                 "AND t.status = :status");
         query.setParameter("eventId", eventId);
         query.setParameter("status", status);
+        query.setFlushMode(FlushModeType.COMMIT);
         return (long) query.getSingleResult();
     }
 
