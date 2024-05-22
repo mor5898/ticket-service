@@ -1,5 +1,6 @@
 package com.benevolo.repo;
 
+import com.benevolo.entity.BookingItem;
 import com.benevolo.entity.Ticket;
 import com.benevolo.utils.TicketStatus;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
@@ -27,4 +28,7 @@ public class TicketRepo implements PanacheRepositoryBase<Ticket, String> {
                 Parameters.with("eventId", eventId).and("date", date));
     }
 
+    public List<Ticket> findByBookingItemId(String bookingItemId) {
+        return find("bookingItem.id = :bookingItemId", Parameters.with("bookingItemId", bookingItemId)).list();
+    }
 }

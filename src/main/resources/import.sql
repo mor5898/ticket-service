@@ -1,8 +1,3 @@
-DROP SCHEMA IF EXISTS benevolo_ticket_service CASCADE;
-CREATE SCHEMA benevolo_ticket_service;
-
-SET schema 'benevolo_ticket_service';
-
 CREATE TABLE customer (
     id VARCHAR(256),
     stripe_id VARCHAR(256),
@@ -45,11 +40,14 @@ VALUES ('aa75b92f-510c-44de-9fa0-5523ba6d96c2', '849380', 'a.d@mail.de'),
          ('cc75b92f-510c-44de-9fa0-5523ba6d96c2', '849382', 'f.s@icloud.com');
 
 INSERT INTO booking(id, event_id, booked_at, customer_id)
-VALUES ('377f870c-5a29-46e4-ac86-706c0ff00dc2', '383f700f-5449-4e40-b509-bee0b5d139d6', '2024-05-12 10:34:12', 'aa75b92f-510c-44de-9fa0-5523ba6d96c2');
+VALUES ('377f870c-5a29-46e4-ac86-706c0ff00dc2', '383f700f-5449-4e40-b509-bee0b5d139d6', '2024-05-12 15:34:12', 'aa75b92f-510c-44de-9fa0-5523ba6d96c2'),
+       ('acdf870c-5a29-46e4-ac86-706c0ff00dc2', '383f700f-5449-4e40-b509-bee0b5d139d6', '2024-06-03 09:12:35', 'aa75b92f-510c-44de-9fa0-5523ba6d96c2');
 
 INSERT INTO booking_item(id, quantity, ticket_type_id, booking_id)
 VALUES ('a4a83ecc-098c-445f-9d94-0c98b5c3de0b', 3, '223f700f-5449-4e40-b509-bee0b5d139d6', '377f870c-5a29-46e4-ac86-706c0ff00dc2'),
-       ('6379fd9f-a4d9-4828-a7a1-4bf89f36d0b6', 2, '223f700f-5449-4e40-b509-bee0b5d139d6', '377f870c-5a29-46e4-ac86-706c0ff00dc2');
+       ('6379fd9f-a4d9-4828-a7a1-4bf89f36d0b6', 2, '223f700f-5449-4e40-b509-bee0b5d139d6', '377f870c-5a29-46e4-ac86-706c0ff00dc2'),
+       ('aba83ecc-098c-445f-9d94-0c98b5c3de0b', 3, '223f700f-5449-4e40-b509-bee0b5d139d6', 'acdf870c-5a29-46e4-ac86-706c0ff00dc2'),
+       ('ab79fd9f-a4d9-4828-a7a1-4bf89f36d0b6', 2, '223f700f-5449-4e40-b509-bee0b5d139d6', 'acdf870c-5a29-46e4-ac86-706c0ff00dc2');
 
 INSERT INTO ticket(id, public_id, status, price, tax_rate, booking_item_id)
 VALUES ('6375b92f-510c-44de-9fa0-5523ba6d96c2', '654927', 'VALID', 2000, 19, 'a4a83ecc-098c-445f-9d94-0c98b5c3de0b'),
@@ -59,15 +57,15 @@ VALUES ('6375b92f-510c-44de-9fa0-5523ba6d96c2', '654927', 'VALID', 2000, 19, 'a4
        ('4375b92f-510c-44de-9fa0-5523ba6d96c2', '234927', 'VALID', 2000, 19, 'a4a83ecc-098c-445f-9d94-0c98b5c3de0b'),
        ('5375b92f-510c-44de-9fa0-5523ba6d96c2', '984927', 'REDEEMED', 2000, 19, 'a4a83ecc-098c-445f-9d94-0c98b5c3de0b'),
        ('7375b92f-510c-44de-9fa0-5523ba6d96c2', '184927', 'REDEEMED', 2000, 19, 'a4a83ecc-098c-445f-9d94-0c98b5c3de0b'),
-       ('8375b92f-510c-44de-9fa0-5523ba6d96c2', '544927', 'REDEEMED', 2000, 19, 'a4a83ecc-098c-445f-9d94-0c98b5c3de0b'),
+       ('8375b92f-510c-44de-9fa0-5523ba6d96c2', '544927', 'REDEEMED', 2000, 19, '6379fd9f-a4d9-4828-a7a1-4bf89f36d0b6'),
        ('9375b92f-510c-44de-9fa0-5523ba6d96c2', '144927', 'REDEEMED', 2000, 19, '6379fd9f-a4d9-4828-a7a1-4bf89f36d0b6'),
-       ('0375b92f-510c-44de-9fa0-5523ba6d96c2', '154927', 'CANCELLED', 2000, 19, '6379fd9f-a4d9-4828-a7a1-4bf89f36d0b6'),
-       ('a375b92f-510c-44de-9fa0-5523ba6d96c2', '834927', 'CANCELLED', 2000, 19, '6379fd9f-a4d9-4828-a7a1-4bf89f36d0b6'),
-       ('b375b92f-510c-44de-9fa0-5523ba6d96c2', '824927', 'CANCELLED', 2000, 19, '6379fd9f-a4d9-4828-a7a1-4bf89f36d0b6'),
-       ('c375b92f-510c-44de-9fa0-5523ba6d96c2', '894927', 'CANCELLED', 2000, 19, '6379fd9f-a4d9-4828-a7a1-4bf89f36d0b6');
+       ('0375b92f-510c-44de-9fa0-5523ba6d96c2', '154927', 'CANCELLED', 2000, 19, 'aba83ecc-098c-445f-9d94-0c98b5c3de0b'),
+       ('a375b92f-510c-44de-9fa0-5523ba6d96c2', '834927', 'CANCELLED', 2000, 19, 'aba83ecc-098c-445f-9d94-0c98b5c3de0b'),
+       ('b375b92f-510c-44de-9fa0-5523ba6d96c2', '824927', 'CANCELLED', 2000, 19, 'ab79fd9f-a4d9-4828-a7a1-4bf89f36d0b6'),
+       ('c375b92f-510c-44de-9fa0-5523ba6d96c2', '894927', 'CANCELLED', 2000, 19, 'ab79fd9f-a4d9-4828-a7a1-4bf89f36d0b6');
 
 
-INSERT INTO booking(id, event_id, booked_at, customer_id)
+/*INSERT INTO booking(id, event_id, booked_at, customer_id)
 SELECT gen_random_uuid(), '383f700f-5449-4e40-b509-bee0b5d139d6' , (NOW() - (floor(random() * 120) || ' days')::interval)::date
      , 'bb75b92f-510c-44de-9fa0-5523ba6d96c2'
 FROM generate_series(1,5000) id;
@@ -78,5 +76,5 @@ FROM generate_series(1,5000);
 
 INSERT INTO ticket(id, public_id, status, price, tax_rate, booking_item_id)
 SELECT gen_random_uuid(), floor(random() * 1000000)::text, 'VALID', 2000, 19, (SELECT id FROM booking_item ORDER BY RANDOM() LIMIT 1)
-FROM generate_series(1,5000);
+FROM generate_series(1,5000);*/
 

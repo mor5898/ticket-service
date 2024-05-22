@@ -116,4 +116,8 @@ public class TicketService {
         }
         return statsByDate;
     }
+
+    public List<Ticket> findByBookingItemId(String bookingItemId) {
+        return ticketRepo.findByBookingItemId(bookingItemId);
+    }
 }

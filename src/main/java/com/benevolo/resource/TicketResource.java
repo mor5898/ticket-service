@@ -49,6 +49,13 @@ public class TicketResource {
     }
 
     @GET
+    @Path("/booking-items/{id}/tickets")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Ticket> findTicketsByBookingItemId(@PathParam("id") String bookingItemId) {
+        return ticketService.findByBookingItemId(bookingItemId);
+    }
+
+    @GET
     @Path("/events/{eventId}/tickets/{pageIndex}/{pageSize}")
     @Produces(MediaType.APPLICATION_JSON)
     public List<Ticket> get(@PathParam("eventId") String id, @PathParam("pageIndex") Integer pageIndex, @PathParam("pageSize") Integer pageSize) {
