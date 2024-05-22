@@ -3,25 +3,32 @@ package com.benevolo.resource;
 import com.benevolo.DTO.StatsDTO;
 import com.benevolo.entity.Booking;
 import com.benevolo.entity.Ticket;
+import com.benevolo.repo.TicketRepo;
 import com.benevolo.service.TicketService;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.benevolo.utils.TicketStatus;
 import io.vertx.core.http.HttpServerResponse;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import org.hibernate.annotations.Synchronize;
 
 import java.util.List;
+
+import static jakarta.transaction.Transactional.TxType.REQUIRES_NEW;
 
 @Path("")
 public class TicketResource {
 
     private final TicketService ticketService;
     private final HttpServerResponse httpServerResponse;
+    private final TicketRepo ticketRepo;
 
     @Inject
-    public TicketResource(TicketService ticketService, HttpServerResponse httpServerResponse) {
+    public TicketResource(TicketService ticketService, HttpServerResponse httpServerResponse, TicketRepo ticketRepo) {
         this.ticketService = ticketService;
         this.httpServerResponse = httpServerResponse;
+        this.ticketRepo = ticketRepo;
     }
 
     @POST
@@ -66,15 +73,35 @@ public class TicketResource {
     @GET
     @Path("/events/{eventId}/ticketstatsbyday/{startDate}/{endDate}")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<StatsDTO> getTicketStatsByDay(@PathParam("eventId") String eventId, @PathParam("startDate") String startDate, @PathParam("endDate") String endDate){
+    public List<StatsDTO> getTicketStatsByDay(@PathParam("eventId") String eventId, @PathParam("startDate") String startDate, @PathParam("endDate") String endDate) {
         return ticketService.getTicketStatsByDay(eventId, startDate, endDate);
     }
 
     @GET
     @Path("/events/{eventId}/bookingstatsbyday/{startDate}/{endDate}")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<StatsDTO> getBookingStatsByDay(@PathParam("eventId") String eventId, @PathParam("startDate") String startDate, @PathParam("endDate") String endDate){
+    public List<StatsDTO> getBookingStatsByDay(@PathParam("eventId") String eventId, @PathParam("startDate") String startDate, @PathParam("endDate") String endDate) {
         return ticketService.getBookingStatsByDay(eventId, startDate, endDate);
+    }
+
+    @GET
+    @Path("/event/{eventId}/redeemed/amount")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Transactional(REQUIRES_NEW)
+    public long getValidatedTicketsAmount(@PathParam("eventId") String eventId) {
+        // geht nicht, race condition
+        long count = ticketRepo.countByStatus(eventId, TicketStatus.REDEEMED);
+        return count;
+    }
+
+    @GET
+    @Path("/event/{eventId}/valid-tickets/amount")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Transactional(REQUIRES_NEW)
+    public long getUnvalidatedTicketsAmount(@PathParam("eventId") String eventId) {
+        // geht nicht race condition
+        long count = ticketRepo.countByStatus(eventId, TicketStatus.VALID);
+        return count;
     }
 
 }
