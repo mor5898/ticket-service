@@ -1,15 +1,18 @@
 package com.benevolo.resource;
 
+import com.benevolo.DTO.SearchDTO;
 import com.benevolo.client.TicketTypeClient;
 import com.benevolo.entity.Booking;
 import com.benevolo.entity.TicketType;
 import com.benevolo.repo.BookingRepo;
+import com.benevolo.service.BookingService;
 import io.vertx.core.http.HttpServerResponse;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -22,21 +25,27 @@ public class BookingResource {
     TicketTypeClient ticketTypeClient;
     private final HttpServerResponse httpServerResponse;
 
+    private final BookingService bookingService;
+
     private final BookingRepo bookingRepo;
 
     @Inject
-    public BookingResource(BookingRepo bookingRepo, HttpServerResponse httpServerResponse
-    ) {
+    public BookingResource(BookingRepo bookingRepo, HttpServerResponse httpServerResponse,
+                           BookingService bookingService) {
         this.bookingRepo = bookingRepo;
         this.httpServerResponse = httpServerResponse;
+        this.bookingService = bookingService;
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{pageIndex}")
-    public List<Booking> getAll(@QueryParam("eventId") String eventId, @PathParam("pageIndex") Integer pageIndex) {
+    public List<Booking> getAll(@QueryParam("eventId") String eventId,
+                                @PathParam("pageIndex") Integer pageIndex,
+                                @QueryParam("term") String term,
+                                @QueryParam("bookedFrom") String bookedFrom) {
         final int PAGE_SIZE = 15;
-        List<Booking> bookings = bookingRepo.findByEventId(eventId, pageIndex, PAGE_SIZE);
+        List<Booking> bookings = bookingService.findByEventIdAndSearch(eventId, pageIndex, new SearchDTO(term, bookedFrom));
         Map<String, TicketType> ticketTypeMap = ticketTypeClient.findByEventId(eventId).stream()
                 .collect(Collectors.toMap(TicketType::getId, Function.identity()));
 
