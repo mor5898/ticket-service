@@ -7,11 +7,17 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.jboss.logmanager.Level;
+
+import java.io.IOException;
+import java.util.logging.Logger;
 
 @Path("/mail")
 @Produces(MediaType.APPLICATION_JSON) // not sure about this?
 @Consumes(MediaType.APPLICATION_JSON)
 public class MailResource {
+
+    private static final Logger LOGGER = Logger.getLogger(MailResource.class.getName());
 
     private final PdfService pdfService;
 
@@ -24,13 +30,23 @@ public class MailResource {
     }
 
     @GET
-    @Path("/{eventId}/{bookingId}")
-    public void buildAndSendMail(@PathParam("eventId") String eventId ,@PathParam("bookingId") String bookingId) throws WebApplicationException {
+    @Path("/{bookingId}")
+    public void buildAndSendMail(@PathParam("bookingId") String bookingId) throws WebApplicationException {
+        PDDocument pdf = null;
         try {
-            PDDocument pdf = pdfService.createPdf(eventId, bookingId);
-            mailService.sendEmail(pdf);
+            pdf = pdfService.createPdf(bookingId);
+            mailService.sendEmail(pdf, bookingId);
         } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Fehler", e);
             throw new WebApplicationException("Error while building and sending mail", Response.Status.INTERNAL_SERVER_ERROR);
+        } finally {
+            if (pdf != null) {
+                try {
+                    pdf.close();
+                } catch (IOException e) {
+                    LOGGER.log(Level.SEVERE, "Error closing PDF document");
+                }
+            }
         }
     }
 }

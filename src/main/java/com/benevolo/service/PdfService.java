@@ -39,9 +39,8 @@ public class PdfService {
         this.bookingRepo = bookingRepo;
     }
 
-    public PDDocument createPdf(String eventId, String bookingId) throws SQLException, WriterException {
-        try (PDDocument document = new PDDocument()) {
-
+    public PDDocument createPdf(String bookingId) throws SQLException, WriterException, IOException {
+            PDDocument document = new PDDocument();
             String ticketTypeName = "";
             String validFrom = "";
             String validTo = "";
@@ -98,9 +97,6 @@ public class PdfService {
 
             //document.save("ticketExample\\FestivalTickets.pdf"); // only for testing, needs to be removed for production
             return document;
-        } catch (IOException e) {
-            return null;
-        }
     }
 
     private static void drawTicket(PDDocument document, PDPage page, PDType0Font font, PDImageXObject image, float startY, PDImageXObject qrCode,
