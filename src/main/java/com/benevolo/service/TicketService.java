@@ -80,8 +80,17 @@ public class TicketService {
                 bookingItem.addTicket(generateTicket(bookingItem));
             }
         }
+        booking.setTotalPrice(calculateTotal(booking.getBookingItems()));
         Booking.persist(booking);
         List<Ticket> t = Ticket.listAll();
+    }
+
+    private int calculateTotal(List<BookingItem> bookingItems) {
+        int total = 0;
+        for(BookingItem bookingItem: bookingItems) {
+            total += bookingItem.getTicketType().getPrice() * bookingItem.getQuantity();
+        }
+        return total;
     }
 
     private Ticket generateTicket(BookingItem bookingItem) {
