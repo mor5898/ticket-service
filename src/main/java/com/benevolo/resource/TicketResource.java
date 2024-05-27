@@ -11,7 +11,6 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
-import org.hibernate.annotations.Synchronize;
 
 import java.util.List;
 
@@ -89,9 +88,7 @@ public class TicketResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional(REQUIRES_NEW)
     public long getValidatedTicketsAmount(@PathParam("eventId") String eventId) {
-        // geht nicht, race condition
-        long count = ticketRepo.countByStatus(eventId, TicketStatus.REDEEMED);
-        return count;
+        return ticketRepo.countByStatus(eventId, TicketStatus.REDEEMED);
     }
 
     @GET
@@ -99,9 +96,6 @@ public class TicketResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional(REQUIRES_NEW)
     public long getUnvalidatedTicketsAmount(@PathParam("eventId") String eventId) {
-        // geht nicht race condition
-        long count = ticketRepo.countByStatus(eventId, TicketStatus.VALID);
-        return count;
+        return ticketRepo.countByStatus(eventId, TicketStatus.VALID);
     }
-
 }
