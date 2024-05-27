@@ -21,7 +21,6 @@ public class Booking extends PanacheEntityBase {
     @Column(name = "booked_at")
     private LocalDateTime bookedAt;
 
-    @JsonIgnore
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "customer_id")
     private Customer customer;

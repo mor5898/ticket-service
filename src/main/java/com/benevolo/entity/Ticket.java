@@ -9,6 +9,7 @@ import org.hibernate.annotations.Type;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 @Entity
@@ -39,6 +40,7 @@ public class Ticket extends PanacheEntityBase {
     }
 
     public Ticket(TicketStatus status, int price, int taxRate) {
+        this.publicId = generate();
         this.status = status;
         this.price = price;
         this.taxRate = taxRate;
@@ -90,5 +92,14 @@ public class Ticket extends PanacheEntityBase {
 
     public void setBookingItem(BookingItem bookingItem) {
         this.bookingItem = bookingItem;
+    }
+
+    public String generate() {
+        StringBuilder stringBuilder = new StringBuilder();
+        String alphabet = "0123456789";
+        for(int i = 0; i < 6; i++) {
+            stringBuilder.append(alphabet.charAt(new Random().nextInt(alphabet.length())));
+        }
+        return stringBuilder.toString();
     }
 }
