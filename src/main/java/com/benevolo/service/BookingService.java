@@ -32,8 +32,8 @@ public class BookingService {
         String term = extractFromMap(queryParams, "term");
         if(term != null && !term.isBlank()) {
             term = "%" + term + "%";
-            query.append(" and (b.id LIKE :term OR b.customer.email LIKE :term)");
-            parameters.put("term", term);
+            query.append(" and (LOWER(b.id) LIKE :term OR LOWER(b.customer.email) LIKE :term)");
+            parameters.put("term", term.toLowerCase());
         }
 
         String bookedFrom = extractFromMap(queryParams, "dateFrom");
