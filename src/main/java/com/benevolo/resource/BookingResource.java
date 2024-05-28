@@ -10,9 +10,9 @@ import io.vertx.core.http.HttpServerResponse;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.UriInfo;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -29,12 +29,15 @@ public class BookingResource {
 
     private final BookingRepo bookingRepo;
 
+    private final UriInfo uriInfo;
+
     @Inject
     public BookingResource(BookingRepo bookingRepo, HttpServerResponse httpServerResponse,
-                           BookingService bookingService) {
+                           BookingService bookingService, UriInfo uriInfo) {
         this.bookingRepo = bookingRepo;
         this.httpServerResponse = httpServerResponse;
         this.bookingService = bookingService;
+        this.uriInfo = uriInfo;
     }
 
     @GET
@@ -45,7 +48,7 @@ public class BookingResource {
                                 @QueryParam("term") String term,
                                 @QueryParam("bookedFrom") String bookedFrom) {
         final int PAGE_SIZE = 15;
-        List<Booking> bookings = bookingService.findByEventIdAndSearch(eventId, pageIndex, new SearchDTO(term, bookedFrom));
+        List<Booking> bookings = bookingService.findByEventIdAndSearch(eventId, pageIndex, uriInfo.getQueryParameters());
         Map<String, TicketType> ticketTypeMap = ticketTypeClient.findByEventId(eventId).stream()
                 .collect(Collectors.toMap(TicketType::getId, Function.identity()));
 
