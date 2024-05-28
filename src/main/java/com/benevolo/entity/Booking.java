@@ -21,13 +21,15 @@ public class Booking extends PanacheEntityBase {
     @Column(name = "booked_at")
     private LocalDateTime bookedAt;
 
-    @JsonIgnore
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
     @Column(name = "event_id")
     private String eventId;
+
+    @Column(name = "total_price")
+    private int totalPrice;
 
     @JsonManagedReference(value="booking-item")
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL)
@@ -71,5 +73,13 @@ public class Booking extends PanacheEntityBase {
 
     public void setBookedAt(LocalDateTime bookedAt) {
         this.bookedAt = bookedAt;
+    }
+
+    public int getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(int totalPrice) {
+        this.totalPrice = totalPrice;
     }
 }

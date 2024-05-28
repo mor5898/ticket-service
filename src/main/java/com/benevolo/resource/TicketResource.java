@@ -1,11 +1,11 @@
 package com.benevolo.resource;
 
+import com.benevolo.DTO.StatsDTO;
 import com.benevolo.entity.Booking;
 import com.benevolo.entity.Ticket;
+import com.benevolo.repo.TicketRepo;
 import com.benevolo.service.TicketService;
 import com.benevolo.utils.TicketStatus;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.vertx.core.http.HttpServerResponse;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -14,16 +14,20 @@ import jakarta.ws.rs.core.MediaType;
 
 import java.util.List;
 
+import static jakarta.transaction.Transactional.TxType.REQUIRES_NEW;
+
 @Path("")
 public class TicketResource {
 
     private final TicketService ticketService;
     private final HttpServerResponse httpServerResponse;
+    private final TicketRepo ticketRepo;
 
     @Inject
-    public TicketResource(TicketService ticketService, HttpServerResponse httpServerResponse) {
+    public TicketResource(TicketService ticketService, HttpServerResponse httpServerResponse, TicketRepo ticketRepo) {
         this.ticketService = ticketService;
         this.httpServerResponse = httpServerResponse;
+        this.ticketRepo = ticketRepo;
     }
 
     @POST
@@ -51,6 +55,13 @@ public class TicketResource {
     }
 
     @GET
+    @Path("/booking-items/{id}/tickets")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Ticket> findTicketsByBookingItemId(@PathParam("id") String bookingItemId) {
+        return ticketService.findByBookingItemId(bookingItemId);
+    }
+
+    @GET
     @Path("/events/{eventId}/tickets/{pageIndex}/{pageSize}")
     @Produces(MediaType.APPLICATION_JSON)
     public List<Ticket> get(@PathParam("eventId") String id, @PathParam("pageIndex") Integer pageIndex, @PathParam("pageSize") Integer pageSize) {
@@ -58,4 +69,33 @@ public class TicketResource {
         return ticketService.findByEventId(id, pageIndex, pageSize);
     }
 
+    @GET
+    @Path("/events/{eventId}/ticketstatsbyday/{startDate}/{endDate}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<StatsDTO> getTicketStatsByDay(@PathParam("eventId") String eventId, @PathParam("startDate") String startDate, @PathParam("endDate") String endDate) {
+        return ticketService.getTicketStatsByDay(eventId, startDate, endDate);
+    }
+
+    @GET
+    @Path("/events/{eventId}/bookingstatsbyday/{startDate}/{endDate}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<StatsDTO> getBookingStatsByDay(@PathParam("eventId") String eventId, @PathParam("startDate") String startDate, @PathParam("endDate") String endDate) {
+        return ticketService.getBookingStatsByDay(eventId, startDate, endDate);
+    }
+
+    @GET
+    @Path("/event/{eventId}/redeemed/amount")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Transactional(REQUIRES_NEW)
+    public long getValidatedTicketsAmount(@PathParam("eventId") String eventId) {
+        return ticketRepo.countByStatus(eventId, TicketStatus.REDEEMED);
+    }
+
+    @GET
+    @Path("/event/{eventId}/valid-tickets/amount")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Transactional(REQUIRES_NEW)
+    public long getUnvalidatedTicketsAmount(@PathParam("eventId") String eventId) {
+        return ticketRepo.countByStatus(eventId, TicketStatus.VALID);
+    }
 }
