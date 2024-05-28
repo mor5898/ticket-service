@@ -15,6 +15,9 @@ jobs:
       DOCKER_IMAGE_TAG: ${{ github.sha }}
       EVENT_SERVICE_BASE_URL: https://benevolo.de/api/event-service
       CORS_ORIGIN: "https://benevolo.de,https://dev.benevolo.de, https://localhost:3000, https://shop.benevolo.de"
+      MAILER_FROM_MAIL: ${{ secrets.MAILER_FROM_MAIL }}
+      MAILER_USERNAME: ${{ secrets.MAILER_USERNAME }}
+      MAILER_PASSWORD: ${{ secrets.MAILER_PASSWORD }}
 
     steps:
     - name: Checkout
@@ -61,6 +64,9 @@ jobs:
         --build-arg KEYCLOAK_SECRET=$KEYCLOAK_SECRET \
         --build-arg CORS_ORIGIN=$CORS_ORIGIN \
         --build-arg EVENT_SERVICE_BASE_URL=$EVENT_SERVICE_BASE_URL \
+        --build-arg MAILER_FROM_MAIL=$MAILER_FROM_MAIL \
+        --build-arg MAILER_USERNAME=$MAILER_USERNAME \
+        --build-arg MAILER_PASSWORD=$MAILER_PASSWORD \
         -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG .
         
         docker push $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
