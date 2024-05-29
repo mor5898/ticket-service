@@ -26,20 +26,16 @@ import java.util.List;
 @ApplicationScoped
 public class PdfService {
 
-    private final QrCodeService qrCodeService;
+    @Inject
+    QrCodeService qrCodeService;
 
-    private final BookingRepo bookingRepo;
+    @Inject
+    BookingRepo bookingRepo;
 
     @RestClient
     TicketTypeClient ticketTypeClient;
 
-    @Inject
-    public PdfService(QrCodeService qrCodeService, BookingRepo bookingRepo) {
-        this.qrCodeService = qrCodeService;
-        this.bookingRepo = bookingRepo;
-    }
-
-    public PDDocument createPdf(String bookingId) throws SQLException, WriterException, IOException {
+    public PDDocument createPdf(String bookingId) throws WriterException, IOException {
             PDDocument document = new PDDocument();
             String ticketTypeName = "";
             String validFrom = "";
@@ -74,7 +70,7 @@ public class PdfService {
                         count = 0;
                     }
                     String ticketId = ticket.getId();
-                    PDImageXObject qrCodeImage = PDImageXObject.createFromByteArray(document, qrCodeService.generateQRCode(ticketId), "qrCode");
+                    PDImageXObject qrCodeImage = PDImageXObject.createFromByteArray(document, qrCodeService.generateQRCode(ticketId).toByteArray(), "qrCode");
                     float startY = 750 - (count * 250);
 
                     drawTicket(document,
@@ -95,7 +91,6 @@ public class PdfService {
                 }
             }
 
-            //document.save("ticketExample\\FestivalTickets.pdf"); // only for testing, needs to be removed for production
             return document;
     }
 
