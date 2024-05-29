@@ -1,10 +1,10 @@
 package com.benevolo.resource;
 
-import com.benevolo.DTO.SearchDTO;
 import com.benevolo.client.TicketTypeClient;
 import com.benevolo.entity.Booking;
 import com.benevolo.entity.TicketType;
 import com.benevolo.repo.BookingRepo;
+import com.benevolo.repo.TicketRepo;
 import com.benevolo.service.BookingService;
 import io.vertx.core.http.HttpServerResponse;
 import jakarta.inject.Inject;
@@ -12,6 +12,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriInfo;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.jboss.resteasy.reactive.common.NotImplementedYet;
 
 import java.util.List;
 import java.util.Map;
@@ -29,14 +30,17 @@ public class BookingResource {
 
     private final BookingRepo bookingRepo;
 
+    private final TicketRepo ticketRepo;
+
     private final UriInfo uriInfo;
 
     @Inject
     public BookingResource(BookingRepo bookingRepo, HttpServerResponse httpServerResponse,
-                           BookingService bookingService, UriInfo uriInfo) {
+                           BookingService bookingService, TicketRepo ticketRepo, UriInfo uriInfo) {
         this.bookingRepo = bookingRepo;
         this.httpServerResponse = httpServerResponse;
         this.bookingService = bookingService;
+        this.ticketRepo = ticketRepo;
         this.uriInfo = uriInfo;
     }
 
@@ -57,7 +61,7 @@ public class BookingResource {
                 bookingItem.setTicketType(ticketTypeMap.get(bookingItem.getTicketTypeId()));
             });
         });
-        httpServerResponse.headers().add("X-Page-Size", String.valueOf(bookingRepo.countByEventId(eventId, PAGE_SIZE)));
+        httpServerResponse.headers().add("X-Page-Size", String.valueOf(bookingRepo.countPagesByEventId(eventId, PAGE_SIZE)));
         return bookings;
     }
 
@@ -66,6 +70,34 @@ public class BookingResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Booking get(@PathParam("bookingId") String bookingId) {
         return Booking.findById(bookingId);
+    }
+
+    @GET
+    @Path("/total-price")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Long getTotalPrice(@QueryParam("eventId") String eventId) {
+        return bookingRepo.findPriceByEventId(eventId);
+    }
+
+    @GET
+    @Path("/average-price")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Long getAveragePrice(@QueryParam("eventId") String eventId) {
+        return bookingRepo.findAveragePriceByEventId(eventId);
+    }
+
+    @GET
+    @Path("/total-bookings")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Long getTotalBookings(@QueryParam("eventId") String eventId) {
+        return bookingRepo.countByEventId(eventId);
+    }
+
+    @GET
+    @Path("/total-tickets")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Long getTotalTickets(@QueryParam("eventId") String eventId) {
+        return ticketRepo.countByEventId(eventId);
     }
 
 }
