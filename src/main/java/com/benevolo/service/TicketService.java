@@ -70,7 +70,7 @@ public class TicketService {
 
 
     @Transactional
-    public void save(Booking booking) {
+    public Booking save(Booking booking) {
         for (BookingItem bookingItem : booking.getBookingItems()) {
             bookingItem.setBooking(booking);
             booking.setBookedAt(LocalDateTime.now());
@@ -82,7 +82,7 @@ public class TicketService {
         }
         booking.setTotalPrice(calculateTotal(booking.getBookingItems()));
         Booking.persist(booking);
-        List<Ticket> t = Ticket.listAll();
+        return booking;
     }
 
     private int calculateTotal(List<BookingItem> bookingItems) {
