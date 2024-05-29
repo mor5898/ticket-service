@@ -34,8 +34,8 @@ public class TicketResource {
     @Path("/tickets")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public void post(Booking booking) {
-        ticketService.save(booking);
+    public Booking post(Booking booking) {
+        return ticketService.save(booking);
     }
 
     @PUT
