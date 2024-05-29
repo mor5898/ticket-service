@@ -13,26 +13,23 @@ import java.io.IOException;
 @ApplicationScoped
 public class MailService {
 
-    private final Mailer mailer;
-
     @Inject
-    public MailService(Mailer mailer) {
-        this.mailer = mailer;
-    }
+    Mailer mailer;
 
     public void sendEmail(PDDocument pdf, String bookingId) throws IOException {
-        ByteArrayOutputStream ticketOutputStream = new ByteArrayOutputStream();
-        pdf.save(ticketOutputStream);
-        Booking booking = Booking.findById(bookingId);
-        Customer customer = booking.getCustomer();
+        try (ByteArrayOutputStream ticketOutputStream = new ByteArrayOutputStream()) {
+            pdf.save(ticketOutputStream);
+            Booking booking = Booking.findById(bookingId);
+            Customer customer = booking.getCustomer();
 
-        mailer.send(
-                Mail.withText(customer.getEmail(),
-                        "Tickets Benevolo Shop",
-                        "Ihre Tickets sind im Anhang zu finden. :)"
-                ).addAttachment("ticket.pdf",
-                        ticketOutputStream.toByteArray(),
-                        "application/pdf")
-        );
+            mailer.send(
+                    Mail.withText(customer.getEmail(),
+                            "Tickets Benevolo Shop",
+                            "Ihre Tickets sind im Anhang zu finden. :)"
+                    ).addAttachment("ticket.pdf",
+                            ticketOutputStream.toByteArray(),
+                            "application/pdf")
+            );
+        }
     }
 }
