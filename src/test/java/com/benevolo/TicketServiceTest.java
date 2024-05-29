@@ -69,7 +69,7 @@ public class TicketServiceTest {
                 .when()
                 .post("/tickets")
                 .then()
-                .statusCode(204);
+                .statusCode(200);
 
         //Assert.equals(1, bookingRepo.listAll().size());
         //Assert.equals(2, bookingItemRepo.listAll().size());
