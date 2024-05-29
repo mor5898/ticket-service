@@ -16,7 +16,7 @@ public class MailService {
     @Inject
     Mailer mailer;
 
-    public void sendEmail(PDDocument pdf, String bookingId) throws IOException {
+    public void sendEmailWithPdf(PDDocument pdf, String bookingId) throws IOException {
         try (ByteArrayOutputStream ticketOutputStream = new ByteArrayOutputStream()) {
             pdf.save(ticketOutputStream);
             Booking booking = Booking.findById(bookingId);
