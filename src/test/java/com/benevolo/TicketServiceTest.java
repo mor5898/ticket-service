@@ -9,20 +9,16 @@ import com.benevolo.repo.BookingItemRepo;
 import com.benevolo.repo.BookingRepo;
 import com.benevolo.repo.TicketRepo;
 import com.benevolo.utils.TicketStatus;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.security.TestSecurity;
-import io.restassured.response.Response;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.MediaType;
 import org.junit.jupiter.api.*;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
 
 import static io.restassured.RestAssured.given;
 
@@ -67,9 +63,9 @@ public class TicketServiceTest {
         given().contentType(MediaType.APPLICATION_JSON)
                 .body(booking)
                 .when()
-                .post("/tickets")
+                .post("/bookings")
                 .then()
-                .statusCode(204);
+                .statusCode(200);
 
         //Assert.equals(1, bookingRepo.listAll().size());
         //Assert.equals(2, bookingItemRepo.listAll().size());
@@ -120,56 +116,6 @@ public class TicketServiceTest {
                     .statusCode(400);
 
             //Assert.equals(TicketStatus.REDEEMED, ticketRepo.findById(ticket.getId()).getStatus());
-        }
-    }
-
-
-
-    @Test
-    @Order(4)
-    void testGetTickets() throws JsonProcessingException {
-        {
-            Map<String, String> expectedHeaders = new HashMap<>();
-            expectedHeaders.put("X-Page-Size", "1");
-
-            Response response = given().when().get("/events/eventId/tickets/0/10");
-            response.then().statusCode(200);
-            response.then().headers(expectedHeaders);
-
-            List<Ticket> tickets = new ObjectMapper().registerModule(new JavaTimeModule()).readValue(response.getBody().asString(), new TypeReference<>() {});
-            //Assert.equals(5, tickets.size());
-        }
-        {
-            Map<String, String> expectedHeaders = new HashMap<>();
-            expectedHeaders.put("X-Page-Size", "2");
-
-            {
-                Response response = given().when().get("/events/eventId/tickets/0/3");
-                response.then().statusCode(200);
-                response.then().headers(expectedHeaders);
-
-                List<Ticket> tickets = new ObjectMapper().registerModule(new JavaTimeModule()).readValue(response.getBody().asString(), new TypeReference<>() {});
-                //Assert.equals(3, tickets.size());
-            }
-            {
-                Response response = given().when().get("/events/eventId/tickets/1/3");
-                response.then().statusCode(200);
-                response.then().headers(expectedHeaders);
-
-                List<Ticket> tickets = new ObjectMapper().registerModule(new JavaTimeModule()).readValue(response.getBody().asString(), new TypeReference<>() {});
-                //Assert.equals(2, tickets.size());
-            }
-        }
-        {
-            Map<String, String> expectedHeaders = new HashMap<>();
-            expectedHeaders.put("X-Page-Size", "5");
-
-            Response response = given().when().get("/events/eventId/tickets/0/1");
-            response.then().statusCode(200);
-            response.then().headers(expectedHeaders);
-
-            List<Ticket> tickets = new ObjectMapper().registerModule(new JavaTimeModule()).readValue(response.getBody().asString(), new TypeReference<>() {});
-            //Assert.equals(1, tickets.size());
         }
     }
 

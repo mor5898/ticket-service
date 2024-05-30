@@ -13,24 +13,18 @@ import jakarta.inject.Inject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @ApplicationScoped
 public class QrCodeService {
 
-    private final TicketRepo ticketRepo;
-
     @Inject
-    public QrCodeService(TicketRepo ticketRepo) {
-        this.ticketRepo = ticketRepo;
-    }
+    TicketRepo ticketRepo;
 
-    public byte[] generateQRCode(String ticketId) throws SQLException, WriterException, IOException {
+    public ByteArrayOutputStream generateQRCode(String ticketId) throws WriterException, IOException {
         Ticket ticket = ticketRepo.findById(ticketId);
-        List<Ticket> list = ticketRepo.listAll();
+        ByteArrayOutputStream bas = new ByteArrayOutputStream();
         if (ticket != null) {
             Map<String, Object> qrData = new HashMap<>();
             qrData.put("ticket_id", ticketId);
@@ -39,12 +33,9 @@ public class QrCodeService {
 
             ObjectMapper objectMapper = new ObjectMapper();
             String json = objectMapper.writeValueAsString(qrData);
-            ByteArrayOutputStream bas = new ByteArrayOutputStream();
             BitMatrix matrix = new QRCodeWriter().encode(json, BarcodeFormat.QR_CODE, 200, 200);
             MatrixToImageWriter.writeToStream(matrix, "PNG", bas);
-            return bas.toByteArray();
-        } else {
-            return null;
         }
+        return bas;
     }
 }

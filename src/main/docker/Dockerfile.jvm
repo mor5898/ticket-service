@@ -91,11 +91,21 @@ ENV KEYCLOAK_SECRET $KEYCLOAK_SECRET
 ENV CORS_ORIGIN $CORS_ORIGIN
 ENV EVENT_SERVICE_BASE_URL $EVENT_SERVICE_BASE_URL
 
+# Mailing
+ARG MAILER_FROM_MAIL
+ARG MAILER_USERNAME
+ARG MAILER_PASSWORD
+ENV MAILER_FROM_MAIL $MAILER_FROM_MAIL
+ENV MAILER_USERNAME $MAILER_USERNAME
+ENV MAILER_PASSWORD $MAILER_PASSWORD
+
 # We make four distinct layers so if there are application changes the library layers can be re-used
 COPY --chown=185 target/quarkus-app/lib/ /deployments/lib/
 COPY --chown=185 target/quarkus-app/*.jar /deployments/
 COPY --chown=185 target/quarkus-app/app/ /deployments/app/
 COPY --chown=185 target/quarkus-app/quarkus/ /deployments/quarkus/
+COPY --chown=185 font/* /deployments/font/
+COPY --chown=185 img/* /deployments/img/
 
 EXPOSE 8080
 USER 185
