@@ -123,7 +123,7 @@ SELECT gen_random_uuid(), gen_random_uuid(), CONCAT(LOWER(p.first_name), '.', LO
 INSERT INTO booking(id, event_id, total_price, booked_at, customer_id)
 SELECT gen_random_uuid(), '383f700f-5449-4e40-b509-bee0b5d139d6', p.price, (NOW() - (floor(random() * 120) || ' days')::interval)::date
      , c.id
-FROM generate_series(1, 15) id, price AS p, customer AS c;
+FROM generate_series(1, 3) id, price AS p, customer AS c;
 
 INSERT INTO booking_item(id, quantity, ticket_type_id, booking_id)
 SELECT gen_random_uuid(), floor(random() * 10) + 1, '223f700f-5449-4e40-b509-bee0b5d139d6', b.id

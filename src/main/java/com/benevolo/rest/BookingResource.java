@@ -60,7 +60,7 @@ public class BookingResource {
             });
         });
 
-        httpServerResponse.headers().add("X-Page-Size", String.valueOf(bookingRepo.countPagesByEventId(eventId, PAGE_SIZE)));
+        httpServerResponse.headers().add("X-Page-Size", String.valueOf(bookingService.countByEventIdAndSearch(eventId, PAGE_SIZE, bookingSearchParams)));
         return bookings;
     }
 
