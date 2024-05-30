@@ -1,8 +1,7 @@
 package com.benevolo.service;
 
-import com.benevolo.DTO.StatsDTO;
 import com.benevolo.client.TicketTypeClient;
-import com.benevolo.entity.Booking;
+import com.benevolo.dto.StatsDTO;
 import com.benevolo.entity.BookingItem;
 import com.benevolo.entity.Ticket;
 import com.benevolo.entity.TicketType;
@@ -17,7 +16,6 @@ import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -27,27 +25,11 @@ public class TicketService {
     @RestClient
     TicketTypeClient ticketTypeClient;
 
-    private final TicketRepo ticketRepo;
-    private final BookingRepo bookingRepo;
+    @Inject
+    TicketRepo ticketRepo;
 
     @Inject
-    public TicketService(TicketRepo ticketRepo, BookingRepo bookingRepo) {
-        this.ticketRepo = ticketRepo;
-        this.bookingRepo = bookingRepo;
-    }
-
-    public List<Ticket> findByEventId(String eventId, Integer pageIndex, Integer pageSize) {
-        List<Ticket> tickets = ticketRepo.findByEventId(eventId, pageIndex, pageSize);
-        tickets.forEach(item -> {
-            BookingItem bookingItem = item.getBookingItem();
-            bookingItem.setTicketType(ticketTypeClient.findById(bookingItem.getTicketTypeId()));
-        });
-        return tickets;
-    }
-
-    public long countByEventId(String eventId, Integer pageSize) {
-        return (long) Math.ceil((ticketRepo.countByEventId(eventId) * 1.0) / pageSize);
-    }
+    BookingRepo bookingRepo;
 
     @Transactional
     public void update(String ticketId, Ticket ticket) {
@@ -68,41 +50,15 @@ public class TicketService {
         throw new BadRequestException(Response.ok("invalid_ticket_status").status(400).build());
     }
 
-
-    @Transactional
-    public Booking save(Booking booking) {
-        for (BookingItem bookingItem : booking.getBookingItems()) {
-            bookingItem.setBooking(booking);
-            booking.setBookedAt(LocalDateTime.now());
-            bookingItem.setTicketType(ticketTypeClient.findById(bookingItem.getTicketTypeId()));
-            bookingItem.setTickets(new LinkedList<>());
-            for (int i = 0; i < bookingItem.getQuantity(); i++) {
-                bookingItem.addTicket(generateTicket(bookingItem));
-            }
-        }
-        booking.setTotalPrice(calculateTotal(booking.getBookingItems()));
-        Booking.persist(booking);
-        return booking;
-    }
-
-    private int calculateTotal(List<BookingItem> bookingItems) {
-        int total = 0;
-        for(BookingItem bookingItem: bookingItems) {
-            total += bookingItem.getTicketType().getPrice() * bookingItem.getQuantity();
-        }
-        return total;
-    }
-
-    private Ticket generateTicket(BookingItem bookingItem) {
+    public Ticket generateTicket(BookingItem bookingItem) {
         TicketType ticketType = ticketTypeClient.findById(bookingItem.getTicketTypeId());
         return new Ticket(TicketStatus.VALID, ticketType.getPrice(), ticketType.getTaxRate());
     }
 
     public synchronized List<StatsDTO> getTicketStatsByDay(String eventId, String startDate, String endDate) {
-        LocalDate start = LocalDate.parse(startDate);
         LocalDate end = LocalDate.parse(endDate).plusDays(1);
 
-        List<LocalDate> dates = start.datesUntil(end).toList();
+        List<LocalDate> dates = LocalDate.parse(startDate).datesUntil(end).toList();
         List<StatsDTO> statsByDate = new LinkedList<>();
 
         for (LocalDate date : dates) {

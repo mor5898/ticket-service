@@ -1,4 +1,4 @@
-package com.benevolo.resource;
+package com.benevolo.rest;
 
 import com.benevolo.entity.Booking;
 import com.benevolo.service.MailService;

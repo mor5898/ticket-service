@@ -1,74 +1,98 @@
 package com.benevolo.service;
 
-import com.benevolo.DTO.SearchDTO;
+import com.benevolo.client.TicketTypeClient;
 import com.benevolo.entity.Booking;
+import com.benevolo.entity.BookingItem;
 import com.benevolo.repo.BookingRepo;
+import com.benevolo.rest.params.BookingSearchParams;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.transaction.Transactional;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @ApplicationScoped
 public class BookingService {
 
-    private final BookingRepo bookingRepo;
+    @Inject
+    BookingRepo bookingRepo;
 
     @Inject
-    public BookingService(BookingRepo bookingRepo) {
-        this.bookingRepo = bookingRepo;
+    TicketService ticketService;
+
+    @RestClient
+    TicketTypeClient ticketTypeClient;
+
+    @Transactional
+    public Booking save(Booking booking) {
+        for (BookingItem bookingItem : booking.getBookingItems()) {
+            bookingItem.setBooking(booking);
+            booking.setBookedAt(LocalDateTime.now());
+            bookingItem.setTicketType(ticketTypeClient.findById(bookingItem.getTicketTypeId()));
+            bookingItem.setTickets(new LinkedList<>());
+            for (int i = 0; i < bookingItem.getQuantity(); i++) {
+                bookingItem.addTicket(ticketService.generateTicket(bookingItem));
+            }
+        }
+        booking.setTotalPrice(calculateTotal(booking.getBookingItems()));
+        Booking.persist(booking);
+        return booking;
     }
 
-    public List<Booking> findByEventIdAndSearch(String eventId, int page, MultivaluedMap<String, String> queryParams) {
+    private int calculateTotal(List<BookingItem> bookingItems) {
+        int total = 0;
+        for(BookingItem bookingItem: bookingItems) {
+            total += bookingItem.getTicketType().getPrice() * bookingItem.getQuantity();
+        }
+        return total;
+    }
+
+    public List<Booking> findByEventIdAndSearch(String eventId, int pageIndex, int pageSize, BookingSearchParams params) {
         StringBuilder query = new StringBuilder();
         Map<String, Object> parameters = new HashMap<>();
         query.append("SELECT b FROM Booking AS b WHERE b.eventId = :eventId");
         parameters.put("eventId", eventId);
 
-        String term = extractFromMap(queryParams, "term");
+        String term = params.term;
         if(term != null && !term.isBlank()) {
             term = "%" + term + "%";
             query.append(" and (LOWER(b.id) LIKE :term OR LOWER(b.customer.email) LIKE :term)");
             parameters.put("term", term.toLowerCase());
         }
 
-        String bookedFrom = extractFromMap(queryParams, "dateFrom");
-        if(bookedFrom != null && !bookedFrom.isBlank()) {
+        LocalDate dateFrom = params.dateFrom;
+        if(dateFrom != null) {
             query.append(" and b.bookedAt >= :bookedFrom");
-            parameters.put("bookedFrom", LocalDate.parse(bookedFrom).atStartOfDay());
+            parameters.put("bookedFrom", dateFrom.atStartOfDay());
         }
 
-        String bookedTo = extractFromMap(queryParams, "dateTo");
-        if(bookedTo != null && !bookedTo.isBlank()) {
+        LocalDate dateTo = params.dateTo;
+        if(dateTo != null) {
             query.append(" and b.bookedAt < :bookedTo");
-            parameters.put("bookedTo", LocalDate.parse(bookedTo).plusDays(1).atStartOfDay());
+            parameters.put("bookedTo", dateTo.plusDays(1).atStartOfDay());
         }
 
-        String priceFrom = extractFromMap(queryParams, "priceFrom");
-        if(priceFrom != null && !priceFrom.isBlank()) {
+        Integer priceFrom = params.priceFrom;
+        if(priceFrom != null) {
             query.append(" and b.totalPrice >= :priceFrom");
-            parameters.put("priceFrom", Integer.valueOf(priceFrom));
+            parameters.put("priceFrom", priceFrom);
         }
 
-        String priceTo = extractFromMap(queryParams, "priceTo");
-        if(priceTo != null && !priceTo.isBlank()) {
+        Integer priceTo = params.priceTo;
+        if(priceTo != null) {
             query.append(" and b.totalPrice <= :priceTo");
-            parameters.put("priceTo", Integer.valueOf(priceTo));
+            parameters.put("priceTo", priceTo);
         }
 
-        return bookingRepo.find(query.toString(), parameters).page(page, 15).list();
-    }
+        query.append(" ORDER BY b.bookedAt DESC");
 
-    private String extractFromMap(MultivaluedMap<String, String> map, String key) {
-        final List<String> value = map.get(key);
-        if(value != null && !value.isEmpty()) {
-            return value.get(0);
-        }
-        return null;
+        return bookingRepo.find(query.toString(), parameters).page(pageIndex, pageSize).list();
     }
 
 }
