@@ -1,14 +1,12 @@
 package com.benevolo.repo;
 
-import com.benevolo.entity.BookingItem;
 import com.benevolo.entity.Ticket;
 import com.benevolo.utils.TicketStatus;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import io.quarkus.panache.common.Parameters;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.persistence.Query;
-
 import jakarta.persistence.FlushModeType;
+import jakarta.persistence.Query;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -32,7 +30,7 @@ public class TicketRepo implements PanacheRepositoryBase<Ticket, String> {
     }
 
     public List<Ticket> findByBookingItemId(String bookingItemId) {
-        return find("bookingItem.id = :bookingItemId", Parameters.with("bookingItemId", bookingItemId)).list();
+        return find("bookingItem.id = :bookingItemId ORDER BY status", Parameters.with("bookingItemId", bookingItemId)).list();
     }
 
     public synchronized long countByStatus2(String eventId, TicketStatus status) {
