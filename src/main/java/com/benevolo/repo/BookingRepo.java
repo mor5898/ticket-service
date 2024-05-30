@@ -20,10 +20,6 @@ public class BookingRepo implements PanacheRepositoryBase<Booking, String> {
         return find("eventId", eventId).page(pageIndex, pageSize).list();
     }
 
-    public long countPagesByEventId(String eventId, Integer pageSize) {
-        return (long) Math.ceil((count("eventId", eventId) * 1.0) / pageSize);
-    }
-
     public Long findPriceByEventId(String eventId) {
         return getEntityManager().createQuery("SELECT SUM(b.totalPrice) FROM Booking AS b WHERE b.eventId = :eventId", Long.class).setParameter("eventId", eventId).getSingleResult();
     }
