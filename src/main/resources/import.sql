@@ -1,7 +1,47 @@
-DROP SCHEMA IF EXISTS benevolo_ticket_service CASCADE;
-CREATE SCHEMA benevolo_ticket_service;
+/*Testdaten Generierung*/
 
-SET schema 'benevolo_ticket_service';
+CREATE TABLE person(
+    id INTEGER,
+    first_name VARCHAR(256),
+    last_name VARCHAR(256),
+    ending VARCHAR(256),
+    PRIMARY KEY (id)
+);
+
+INSERT INTO person(id, first_name, last_name, ending)
+VALUES (1, 'Andreas', 'Dinauer', '@mail.de'),
+    (2, 'Felix', 'Sewald', '@gmail.com'),
+    (3, 'Andreas', 'Ott', '@gmx.com'),
+    (4, 'Maximilian', 'Berger', '@freenet.de'),
+    (5, 'Eduard', 'Hauser', '@t-online.de'),
+    (6, 'Lukas', 'Dinauer', '@mail.de'),
+    (7, 'Emma', 'Müller', '@gmail.com'),
+    (8, 'Marie', 'Schmidt', '@gmx.com'),
+    (9, 'Mia', 'Weber', '@freenet.de'),
+    (10, 'Clara', 'Mayer', '@t-online.de'),
+    (11, 'Jan', 'Holtman', '@mail.de'),
+    (12, 'Moritz', 'Schwarz', '@gmail.com'),
+    (13, 'Linus', 'Baumeister', '@gmx.com'),
+    (14, 'Anton', 'Weber', '@freenet.de'),
+    (15, 'Tobi', 'Weiß', '@t-online.de');
+
+
+CREATE TABLE price(
+    price INTEGER,
+    PRIMARY KEY (price)
+);
+
+INSERT INTO price(price)
+VALUES (2100), (2050), (3450), (4000), (4280), (5020), (5250), (7080), (7980), (7120), (7770), (10080), (12080), (21080), (20990), (18980), (9080);
+
+CREATE TABLE status(
+    status VARCHAR(32),
+    PRIMARY KEY (status)
+);
+
+INSERT INTO status(status)
+VALUES ('VALID'), ('REDEEMED'), ('CANCELLED');
+/*Testdaten Generierung*/
 
 CREATE TABLE customer (
     id VARCHAR(256),
@@ -77,15 +117,18 @@ VALUES ('6375b92f-510c-44de-9fa0-5523ba6d96c2', '654927', 'VALID', 2000, 19, 'a4
        ('a575b92f-510c-44de-9fa0-5523ba6d96c3', '194926', 'CANCELLED', 2000, 19, 'b379fd9f-a4d9-4828-a7a1-4bf89f36d0b6');
 
 
+INSERT INTO customer(id, stripe_id, email)
+SELECT gen_random_uuid(), gen_random_uuid(), CONCAT(LOWER(p.first_name), '.', LOWER(pp.last_name), ppp.ending) FROM person AS p, person AS pp, person AS ppp ORDER BY RANDOM() LIMIT 20;
+
 INSERT INTO booking(id, event_id, total_price, booked_at, customer_id)
-SELECT gen_random_uuid(), '383f700f-5449-4e40-b509-bee0b5d139d6', 2000 , (NOW() - (floor(random() * 120) || ' days')::interval)::date
-     , 'bb75b92f-510c-44de-9fa0-5523ba6d96c2'
-FROM generate_series(1,5000) id;
+SELECT gen_random_uuid(), '383f700f-5449-4e40-b509-bee0b5d139d6', p.price, (NOW() - (floor(random() * 120) || ' days')::interval)::date
+     , c.id
+FROM generate_series(1, 15) id, price AS p, customer AS c;
 
 INSERT INTO booking_item(id, quantity, ticket_type_id, booking_id)
-SELECT gen_random_uuid(), floor(random() * 10) + 1, '223f700f-5449-4e40-b509-bee0b5d139d6', (SELECT id FROM booking ORDER BY RANDOM() LIMIT 1)
-FROM generate_series(1,5000);
+SELECT gen_random_uuid(), floor(random() * 10) + 1, '223f700f-5449-4e40-b509-bee0b5d139d6', b.id
+FROM generate_series(1,2) id, booking AS b;
 
 INSERT INTO ticket(id, public_id, status, price, tax_rate, booking_item_id)
-SELECT gen_random_uuid(), floor(random() * 1000000)::text, 'VALID', 2000, 19, (SELECT id FROM booking_item ORDER BY RANDOM() LIMIT 1)
-FROM generate_series(1,5000);
+SELECT gen_random_uuid(), floor(random() * 1000000)::text, s.status, 2000, 19, b.id
+FROM generate_series(1, 2), booking_item AS b, status AS s;

@@ -1,4 +1,4 @@
-package com.benevolo.resource;
+package com.benevolo.rest;
 
 import com.benevolo.service.MailService;
 import com.benevolo.service.PdfService;
