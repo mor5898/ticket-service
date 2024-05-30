@@ -5,6 +5,12 @@ import com.benevolo.entity.Booking;
 import com.benevolo.entity.BookingItem;
 import com.benevolo.repo.BookingRepo;
 import com.benevolo.rest.params.BookingSearchParams;
+import com.benevolo.utils.query_builder.QueryBuilder;
+import com.benevolo.utils.query_builder.section.QueryCustomSection;
+import com.benevolo.utils.query_builder.section.QuerySection;
+import com.benevolo.utils.query_builder.section.order_by.OrderBySection;
+import com.benevolo.utils.query_builder.section.order_by.OrderType;
+import com.benevolo.utils.query_builder.util.Compartor;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -12,7 +18,6 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -54,45 +59,42 @@ public class BookingService {
     }
 
     public List<Booking> findByEventIdAndSearch(String eventId, int pageIndex, int pageSize, BookingSearchParams params) {
-        StringBuilder query = new StringBuilder();
-        Map<String, Object> parameters = new HashMap<>();
-        query.append("SELECT b FROM Booking AS b WHERE b.eventId = :eventId");
-        parameters.put("eventId", eventId);
+        return getQueryBuilder(eventId, params)
+                .orderBy(OrderBySection.of("bookedAt", OrderType.DESC))
+                .find(bookingRepo)
+                .page(pageIndex, pageSize)
+                .list();
+    }
+
+    public Long countByEventIdAndSearch(String eventId, int pageSize, BookingSearchParams params) {
+        Long results = getQueryBuilder(eventId, params).count(bookingRepo);
+        return (long) Math.ceil((results * 1.0) / pageSize);
+    }
+
+    private QueryBuilder<Booking> getQueryBuilder(String eventId, BookingSearchParams params) {
+        QueryBuilder<Booking> queryBuilder = QueryBuilder.build();
+
+        queryBuilder.add(QuerySection.of("eventId", Compartor.EQUAlS, eventId));
 
         String term = params.term;
         if(term != null && !term.isBlank()) {
-            term = "%" + term + "%";
-            query.append(" and (LOWER(b.id) LIKE :term OR LOWER(b.customer.email) LIKE :term)");
-            parameters.put("term", term.toLowerCase());
+            queryBuilder.add(QueryCustomSection.of("LOWER(id) LIKE :term OR LOWER(customer.email) LIKE :term", Map.of("term", "%" + term + "%")));
         }
 
         LocalDate dateFrom = params.dateFrom;
         if(dateFrom != null) {
-            query.append(" and b.bookedAt >= :bookedFrom");
-            parameters.put("bookedFrom", dateFrom.atStartOfDay());
+            queryBuilder.add(QuerySection.of("bookedAt", Compartor.GREATER_THAN_OR_EQUALS, params.dateFrom.atStartOfDay()));
         }
 
         LocalDate dateTo = params.dateTo;
         if(dateTo != null) {
-            query.append(" and b.bookedAt < :bookedTo");
-            parameters.put("bookedTo", dateTo.plusDays(1).atStartOfDay());
+            queryBuilder.add(QuerySection.of("bookedAt", Compartor.LESS_THAN, dateTo.plusDays(1).atStartOfDay()));
         }
 
-        Integer priceFrom = params.priceFrom;
-        if(priceFrom != null) {
-            query.append(" and b.totalPrice >= :priceFrom");
-            parameters.put("priceFrom", priceFrom);
-        }
+        queryBuilder.add(QuerySection.of("totalPrice", Compartor.GREATER_THAN_OR_EQUALS, params.priceFrom));
+        queryBuilder.add(QuerySection.of("totalPrice", Compartor.LESS_THAN_OR_EQUALS, params.priceTo));
 
-        Integer priceTo = params.priceTo;
-        if(priceTo != null) {
-            query.append(" and b.totalPrice <= :priceTo");
-            parameters.put("priceTo", priceTo);
-        }
-
-        query.append(" ORDER BY b.bookedAt DESC");
-
-        return bookingRepo.find(query.toString(), parameters).page(pageIndex, pageSize).list();
+        return queryBuilder;
     }
 
 }
