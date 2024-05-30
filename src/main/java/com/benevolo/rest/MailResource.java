@@ -1,5 +1,6 @@
 package com.benevolo.rest;
 
+import com.benevolo.entity.Booking;
 import com.benevolo.service.MailService;
 import com.benevolo.service.PdfService;
 import jakarta.ws.rs.*;
@@ -24,10 +25,11 @@ public class MailResource {
     MailService mailService;
 
     @POST
-    @Path("/{bookingId}")
-    public void buildAndSendMail(@PathParam("bookingId") String bookingId) throws WebApplicationException {
-        try (PDDocument pdf = pdfService.createPdf(bookingId)) {
-            mailService.sendEmail(pdf, bookingId);
+    @Path("/tickets")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void buildAndSendMail(Booking booking) throws WebApplicationException {
+        try (PDDocument pdf = pdfService.createPdf(booking.getId())) {
+            mailService.sendEmailWithPdf(pdf, booking.getId());
         } catch (Exception e) {
             String msg = "Error while building and sending mail";
             LOGGER.log(Level.SEVERE, msg, e);
