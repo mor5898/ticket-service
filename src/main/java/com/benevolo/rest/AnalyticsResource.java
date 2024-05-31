@@ -16,7 +16,7 @@ import java.util.List;
 
 import static jakarta.transaction.Transactional.TxType.REQUIRES_NEW;
 
-@Path("/event/{eventId}")
+@Path("/events/{eventId}")
 public class AnalyticsResource {
 
     @Inject
