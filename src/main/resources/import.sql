@@ -80,6 +80,17 @@ CREATE TABLE ticket (
     CONSTRAINT uq_public_id UNIQUE (id)
 );
 
+CREATE TABLE cancellation (
+    id VARCHAR(256),
+    ticket_id VARCHAR(256),
+    booking_id VARCHAR(256),
+    requested_at TIMESTAMP,
+    status VARCHAR(32),
+    CONSTRAINT pk_cancellation PRIMARY KEY (id),
+    CONSTRAINT fk_ticket FOREIGN KEY (ticket_id) REFERENCES ticket(id),
+    CONSTRAINT fk_booking FOREIGN KEY (booking_id) REFERENCES booking(id)
+);
+
 INSERT INTO customer(id, stripe_id, email)
 
 VALUES ('aa75b92f-510c-44de-9fa0-5523ba6d96c2', '849380', 'a.d@mail.de'),
@@ -115,6 +126,10 @@ VALUES ('6375b92f-510c-44de-9fa0-5523ba6d96c2', '654927', 'VALID', 2000, 19, 'a4
        ('a375b92f-510c-44de-9fa0-5523ba6d96c3', '124926', 'CANCELLED', 2000, 19, 'b4a83ecc-098c-445f-9d94-0c98b5c3de0b'),
        ('b478b92f-510c-44de-9fa0-5523ba6d96c3', '194926', 'CANCELLED', 2000, 19, 'b379fd9f-a4d9-4828-a7a1-4bf89f36d0b6'),
        ('a575b92f-510c-44de-9fa0-5523ba6d96c3', '194926', 'CANCELLED', 2000, 19, 'b379fd9f-a4d9-4828-a7a1-4bf89f36d0b6');
+
+INSERT INTO cancellation(id, ticket_id, booking_id, requested_at, status)
+
+VALUES ('zn643g8l-510c-44de-9fa0-552m5a6d96c3', '6375b92f-510c-44de-9fa0-5523ba6d96c2', '377f870c-5a29-46e4-ac86-706c0ff00dc2', '2024-05-12 10:34:12', 'PENDING');
 
 
 INSERT INTO customer(id, stripe_id, email)
