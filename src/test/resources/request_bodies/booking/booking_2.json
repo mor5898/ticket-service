@@ -1,0 +1,12 @@
+{
+  "eventId": "event_id",
+  "customer": {
+    "stripeId": "3894stripeId28943",
+    "email": "test@mail.de"
+  },
+  "bookingItems": [
+    {
+      "quantity": 3
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "eventId": "event_id",
+  "customer": {
+    "stripeId": "3894stripeId28943",
+    "email": "test@mail.de"
+  },
+  "bookingItems": [
+    {
+      "quantity": 3,
+      "ticketTypeId": "02e6ee0d-4a79-4d20-a115-eb389b50175c"
+    },
+    {
+      "quantity": 5,
+      "ticketTypeId": "439575ed-8691-4fe1-97ff-e73332d0a379"
+    },
+    {
+      "quantity": 1,
+      "ticketTypeId": "a0f22577-6231-4323-afee-1847d6c53278"
+    }
+  ]
+}
