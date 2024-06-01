@@ -22,7 +22,7 @@ public class TicketResource {
         ticketService.update(ticketId, ticket);
     }
 
-    @PATCH
+    @PUT
     @Path("/{ticketId}/status")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
