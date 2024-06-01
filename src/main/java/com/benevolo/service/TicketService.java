@@ -45,6 +45,7 @@ public class TicketService {
         Ticket ticket = ticketRepo.findById(ticketId);
         if (ticket.getStatus() == TicketStatus.VALID) {
             ticket.setStatus(TicketStatus.REDEEMED);
+            ticketRepo.persist(ticket);
             return;
         }
         throw new BadRequestException(Response.ok("invalid_ticket_status").status(400).build());
@@ -55,7 +56,7 @@ public class TicketService {
         return new Ticket(TicketStatus.VALID, ticketType.getPrice(), ticketType.getTaxRate());
     }
 
-    public synchronized List<StatsDTO> getTicketStatsByDay(String eventId, String startDate, String endDate) {
+    public List<StatsDTO> getTicketStatsByDay(String eventId, String startDate, String endDate) {
         LocalDate end = LocalDate.parse(endDate).plusDays(1);
 
         List<LocalDate> dates = LocalDate.parse(startDate).datesUntil(end).toList();
@@ -68,7 +69,7 @@ public class TicketService {
         return statsByDate;
     }
 
-    public synchronized List<StatsDTO> getBookingStatsByDay(String eventId, String startDate, String endDate) {
+    public List<StatsDTO> getBookingStatsByDay(String eventId, String startDate, String endDate) {
         LocalDate start = LocalDate.parse(startDate);
         LocalDate end = LocalDate.parse(endDate).plusDays(1);
 
