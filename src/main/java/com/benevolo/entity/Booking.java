@@ -29,7 +29,7 @@ public class Booking extends PanacheEntityBase {
     private int totalPrice;
 
     @JsonManagedReference(value="booking-item")
-    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<BookingItem> bookingItems;
 
     public String getId() {
