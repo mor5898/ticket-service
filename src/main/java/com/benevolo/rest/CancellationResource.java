@@ -1,6 +1,7 @@
 package com.benevolo.rest;
 
 import com.benevolo.entity.Cancellation;
+import com.benevolo.repo.CancellationRepo;
 import com.benevolo.service.CancellationService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -16,11 +17,22 @@ public class CancellationResource {
     @Inject
     CancellationService cancellationService;
 
+    @Inject
+    CancellationRepo cancellationRepo;
+
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Cancellation post(Cancellation cancellation) {
-        return cancellationService.save(cancellation);
+    @Path("/{bookingId}")
+    public Cancellation post(@PathParam("bookingId") String bookingId, Cancellation cancellation) {
+        return cancellationService.save(cancellation, bookingId);
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/{eventId}")
+    public List<Cancellation> getCancellationsForEvent(@PathParam("eventId") String eventId) {
+        return cancellationRepo.findAllByEventId(eventId);
     }
 
     @GET
@@ -29,7 +41,7 @@ public class CancellationResource {
     }
 
     @PUT
-    @Path("/{cancellationId}/status/redeemed")
+    @Path("/status/redeemed/{cancellationId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public void redeemCancellationByStatusUpdate(@PathParam("cancellationId") String cancellationId) {
@@ -37,7 +49,7 @@ public class CancellationResource {
     }
 
     @PUT
-    @Path("/{cancellationId}/status/cancelled")
+    @Path("/status/cancelled/{cancellationId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public void cancelCancellationByStatusUpdate(@PathParam("cancellationId") String cancellationId) {
