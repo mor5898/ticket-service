@@ -24,7 +24,7 @@ import static org.hamcrest.Matchers.is;
 @QuarkusTest
 @QuarkusTestResource(TicketTypeClientMock.class)
 @TestSecurity(user = "user")
-public class BookingCreationTest {
+class BookingCreationTest {
 
     @Inject
     BookingRepo bookingRepo;
@@ -42,20 +42,20 @@ public class BookingCreationTest {
     void test() throws IOException {
 
         given()
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(read("request_bodies/booking/booking_1.json")).
-        when()
-            .post("/bookings")
-        .then()
-            .statusCode(200);
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(read("request_bodies/booking/booking_1.json")).
+                when()
+                .post("/bookings")
+                .then()
+                .statusCode(200);
 
         given()
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(read("request_bodies/booking/booking_2.json")).
-        when()
-            .post("/bookings")
-        .then()
-            .statusCode(500);
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(read("request_bodies/booking/booking_2.json")).
+                when()
+                .post("/bookings")
+                .then()
+                .statusCode(500);
 
         assertThat(bookingRepo.count(), is(1L));
         assertThat(bookingItemRepo.count(), is(3L));

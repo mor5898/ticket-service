@@ -30,7 +30,7 @@ import static org.hamcrest.Matchers.is;
 @QuarkusTest
 @QuarkusTestResource(TicketTypeClientMock.class)
 @TestSecurity(user = "user")
-public class BookingSearchTest {
+class BookingSearchTest {
 
     @Inject
     BookingRepo bookingRepo;
@@ -139,7 +139,8 @@ public class BookingSearchTest {
     }
 
     private List<Booking> responseToBookings(ResponseOptions<Response> response) throws JsonProcessingException {
-        return new ObjectMapper().registerModule(new JavaTimeModule()).readValue(response.getBody().print(), new TypeReference<List<Booking>>() {});
+        return new ObjectMapper().registerModule(new JavaTimeModule()).readValue(response.getBody().print(), new TypeReference<List<Booking>>() {
+        });
     }
 
 }

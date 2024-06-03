@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @QuarkusTest
 @QuarkusTestResource(TicketTypeClientMock.class)
 @TestSecurity(user = "user")
-public class TicketUpdateTest {
+class TicketUpdateTest {
 
     @Inject
     TicketRepo ticketRepo;
@@ -38,12 +38,12 @@ public class TicketUpdateTest {
         assert ticket != null;
 
         given()
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(read("/request_bodies/ticket/ticket_update.json"))
-        .when()
-            .put("/tickets/" + ticket.getId())
-        .then()
-            .statusCode(204);
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(read("/request_bodies/ticket/ticket_update.json"))
+                .when()
+                .put("/tickets/" + ticket.getId())
+                .then()
+                .statusCode(204);
 
         em.clear();
 

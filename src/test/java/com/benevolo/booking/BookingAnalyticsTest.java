@@ -30,7 +30,7 @@ import static org.hamcrest.Matchers.is;
 @QuarkusTest
 @QuarkusTestResource(TicketTypeClientMock.class)
 @TestSecurity(user = "user")
-public class BookingAnalyticsTest {
+class BookingAnalyticsTest {
 
     @Inject
     TicketRepo ticketRepo;
@@ -94,28 +94,28 @@ public class BookingAnalyticsTest {
             booking.setEventId("event_id");
             booking.setCustomer(new Customer("stripe_id1", "jan.h@mail.de"));
             booking.setBookedAt(LocalDate.of(2024, 5, 17).atStartOfDay());
-                BookingItem bookingItem = new BookingItem();
-                bookingItem.setBooking(booking);
-                bookingItem.setQuantity(3);
-                    Ticket ticket = new Ticket();
-                    ticket.setBookingItem(bookingItem);
-                    ticket.setPublicId("485784");
-                    ticket.setStatus(TicketStatus.VALID);
-                    ticket.setPrice(2000);
-                    ticket.setTaxRate(19);
-                    Ticket ticket2 = new Ticket();
-                    ticket2.setBookingItem(bookingItem);
-                    ticket2.setPublicId("485784");
-                    ticket2.setStatus(TicketStatus.VALID);
-                    ticket2.setPrice(2000);
-                    ticket2.setTaxRate(19);
-                    Ticket ticket3 = new Ticket();
-                    ticket3.setBookingItem(bookingItem);
-                    ticket3.setPublicId("485784");
-                    ticket3.setStatus(TicketStatus.VALID);
-                    ticket3.setPrice(2000);
-                    ticket3.setTaxRate(19);
-                bookingItem.setTickets(List.of(ticket, ticket2, ticket3));
+            BookingItem bookingItem = new BookingItem();
+            bookingItem.setBooking(booking);
+            bookingItem.setQuantity(3);
+            Ticket ticket = new Ticket();
+            ticket.setBookingItem(bookingItem);
+            ticket.setPublicId("485784");
+            ticket.setStatus(TicketStatus.VALID);
+            ticket.setPrice(2000);
+            ticket.setTaxRate(19);
+            Ticket ticket2 = new Ticket();
+            ticket2.setBookingItem(bookingItem);
+            ticket2.setPublicId("485784");
+            ticket2.setStatus(TicketStatus.VALID);
+            ticket2.setPrice(2000);
+            ticket2.setTaxRate(19);
+            Ticket ticket3 = new Ticket();
+            ticket3.setBookingItem(bookingItem);
+            ticket3.setPublicId("485784");
+            ticket3.setStatus(TicketStatus.VALID);
+            ticket3.setPrice(2000);
+            ticket3.setTaxRate(19);
+            bookingItem.setTickets(List.of(ticket, ticket2, ticket3));
             booking.setBookingItems(List.of(bookingItem));
             bookingRepo.persist(booking);
         }
@@ -126,21 +126,21 @@ public class BookingAnalyticsTest {
             booking.setCustomer(new Customer("stripe_id2", "andreas.d@t-online.de"));
             booking.setBookedAt(LocalDate.of(2024, 5, 19).atStartOfDay());
             BookingItem bookingItem = new BookingItem();
-                bookingItem.setQuantity(2);
-                bookingItem.setBooking(booking);
-                    Ticket ticket = new Ticket();
-                    ticket.setBookingItem(bookingItem);
-                    ticket.setPublicId("485784");
-                    ticket.setStatus(TicketStatus.VALID);
-                    ticket.setPrice(2000);
-                    ticket.setTaxRate(19);
-                    Ticket ticket2 = new Ticket();
-                    ticket2.setBookingItem(bookingItem);
-                    ticket2.setPublicId("485784");
-                    ticket2.setStatus(TicketStatus.VALID);
-                    ticket2.setPrice(2000);
-                    ticket2.setTaxRate(19);
-                bookingItem.setTickets(List.of(ticket, ticket2));
+            bookingItem.setQuantity(2);
+            bookingItem.setBooking(booking);
+            Ticket ticket = new Ticket();
+            ticket.setBookingItem(bookingItem);
+            ticket.setPublicId("485784");
+            ticket.setStatus(TicketStatus.VALID);
+            ticket.setPrice(2000);
+            ticket.setTaxRate(19);
+            Ticket ticket2 = new Ticket();
+            ticket2.setBookingItem(bookingItem);
+            ticket2.setPublicId("485784");
+            ticket2.setStatus(TicketStatus.VALID);
+            ticket2.setPrice(2000);
+            ticket2.setTaxRate(19);
+            bookingItem.setTickets(List.of(ticket, ticket2));
             booking.setBookingItems(List.of(bookingItem));
             bookingRepo.persist(booking);
         }
