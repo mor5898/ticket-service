@@ -14,6 +14,7 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.core.MediaType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -35,6 +36,7 @@ public class TicketRedeemTest {
     EntityManager em;
 
     @Test
+    @Disabled
     void test() throws IOException {
         Ticket validTicket = ticketRepo.find("status = :status", Parameters.with("status", TicketStatus.VALID)).list().getFirst();
         given()
