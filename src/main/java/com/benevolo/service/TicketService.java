@@ -1,5 +1,6 @@
 package com.benevolo.service;
 
+import com.benevolo.client.AnalyticsClient;
 import com.benevolo.client.TicketTypeClient;
 import com.benevolo.dto.StatsDTO;
 import com.benevolo.entity.BookingItem;
@@ -25,6 +26,9 @@ public class TicketService {
     @RestClient
     TicketTypeClient ticketTypeClient;
 
+    @RestClient
+    AnalyticsClient analyticsClient;
+
     @Inject
     TicketRepo ticketRepo;
 
@@ -46,6 +50,9 @@ public class TicketService {
         if (ticket.getStatus() == TicketStatus.VALID) {
             ticket.setStatus(TicketStatus.REDEEMED);
             ticketRepo.persist(ticket);
+            // Save Analytics data and get event id for Ticket
+            String eventId = ticket.getBookingItem().getBooking().getEventId();
+            analyticsClient.createEntryHistory(eventId);
             return;
         }
         throw new BadRequestException(Response.ok("invalid_ticket_status").status(400).build());
