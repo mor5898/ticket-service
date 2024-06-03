@@ -8,7 +8,7 @@ import com.benevolo.utils.query_builder.util.Compartor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class QueryBuilderTest {
+class QueryBuilderTest {
 
     @Test
     void testQueryBuilder() {
