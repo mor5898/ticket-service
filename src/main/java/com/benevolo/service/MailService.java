@@ -2,6 +2,7 @@ package com.benevolo.service;
 
 import com.benevolo.entity.Booking;
 import com.benevolo.entity.Customer;
+import com.benevolo.entity.Ticket;
 import io.quarkus.mailer.Mail;
 import io.quarkus.mailer.Mailer;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -31,5 +32,19 @@ public class MailService {
                             "application/pdf")
             );
         }
+    }
+
+    public void sendCancellation(String ticketId, boolean isApproved) {
+        Ticket ticket = Ticket.findById(ticketId);
+        Customer customer = ticket.getBookingItem().getBooking().getCustomer();
+        String emailText = "Die Stornierung ihres Ticket (id: " + ticket.getId() +
+                ") konnte " + (isApproved ? "erfolgreich" : "nicht erfolgreich") +
+                " durchgeführt werden. Bei weiteren Fragen, wenden sie sich bitte an den Benevolo-Support.";
+        mailer.send(
+                Mail.withText(customer.getEmail(),
+                        "Stornierung Ticket Benevolo Shop",
+                        emailText
+                )
+        );
     }
 }

@@ -1,6 +1,7 @@
 package com.benevolo.rest;
 
 import com.benevolo.entity.Booking;
+import com.benevolo.entity.Ticket;
 import com.benevolo.service.MailService;
 import com.benevolo.service.PdfService;
 import jakarta.ws.rs.*;
@@ -12,7 +13,7 @@ import org.jboss.logmanager.Level;
 import java.util.logging.Logger;
 
 @Path("/mail")
-@Produces(MediaType.APPLICATION_JSON) // not sure about this?
+@Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class MailResource {
 
@@ -32,6 +33,32 @@ public class MailResource {
             mailService.sendEmailWithPdf(pdf, booking.getId());
         } catch (Exception e) {
             String msg = "Error while building and sending mail";
+            LOGGER.log(Level.SEVERE, msg, e);
+            throw new WebApplicationException(msg, Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @POST
+    @Path("/cancellation/approval/{ticketId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void sendCancellationApproval(@PathParam("ticketId") String ticketId) throws WebApplicationException {
+        try {
+            mailService.sendCancellation(ticketId, true);
+        } catch (Exception e) {
+            String msg = "Error while sending cancellation approval";
+            LOGGER.log(Level.SEVERE, msg, e);
+            throw new WebApplicationException(msg, Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @POST
+    @Path("/cancellation/rejection/{ticketId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void sendCancellationRejection(@PathParam("ticketId") String ticketId) throws WebApplicationException {
+        try {
+            mailService.sendCancellation(ticketId, false);
+        } catch (Exception e) {
+            String msg = "Error while sending cancellation rejection";
             LOGGER.log(Level.SEVERE, msg, e);
             throw new WebApplicationException(msg, Response.Status.INTERNAL_SERVER_ERROR);
         }
