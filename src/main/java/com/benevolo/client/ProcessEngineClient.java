@@ -11,6 +11,7 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 @RegisterClientHeaders
 @RegisterRestClient(configKey = "process-engine")
+
 public interface ProcessEngineClient {
 
     @POST
