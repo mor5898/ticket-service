@@ -1,7 +1,6 @@
 package com.benevolo.service;
 
 import com.benevolo.repo.TicketRepo;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
@@ -21,9 +20,7 @@ public class QrCodeService {
 
     public ByteArrayOutputStream generateQRCode(String ticketId) throws WriterException, IOException {
         ByteArrayOutputStream bas = new ByteArrayOutputStream();
-        ObjectMapper objectMapper = new ObjectMapper();
-        String json = objectMapper.writeValueAsString(ticketId);
-        BitMatrix matrix = new QRCodeWriter().encode(json, BarcodeFormat.QR_CODE, 200, 200);
+        BitMatrix matrix = new QRCodeWriter().encode(ticketId, BarcodeFormat.QR_CODE, 200, 200);
         MatrixToImageWriter.writeToStream(matrix, "PNG", bas);
         return bas;
     }
