@@ -7,8 +7,14 @@ import com.benevolo.entity.BookingItem;
 import com.benevolo.entity.Ticket;
 import com.benevolo.entity.TicketType;
 import com.benevolo.repo.BookingRepo;
+import com.benevolo.repo.RefundLinkRepo;
 import com.benevolo.repo.TicketRepo;
+import com.benevolo.rest.params.BookingSearchParams;
 import com.benevolo.utils.TicketStatus;
+import com.benevolo.utils.query_builder.QueryBuilder;
+import com.benevolo.utils.query_builder.section.QueryCustomSection;
+import com.benevolo.utils.query_builder.section.QuerySection;
+import com.benevolo.utils.query_builder.util.Compartor;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -19,6 +25,7 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 @ApplicationScoped
 public class TicketService {
@@ -34,6 +41,9 @@ public class TicketService {
 
     @Inject
     BookingRepo bookingRepo;
+
+    @Inject
+    RefundLinkRepo refundLinkRepo;
 
     @Transactional
     public void update(String ticketId, Ticket ticket) {
@@ -92,5 +102,46 @@ public class TicketService {
 
     public List<Ticket> findByBookingItemId(String bookingItemId) {
         return ticketRepo.findByBookingItemId(bookingItemId);
+    }
+
+    public List<Ticket> findByRefundId(String refundId) {
+        List<Ticket> result = new LinkedList<>();
+        for(BookingItem bookingItem : bookingRepo.findById(refundLinkRepo.findById(refundId).getBooking().getId()).getBookingItems()) {
+            result.addAll(bookingItem.getTickets());
+        }
+        return result;
+    }
+
+    public List<Ticket> findBySearch(String eventId, int pageIndex, int pageSize, BookingSearchParams params) {
+        QueryBuilder<Ticket> queryBuilder = getQueryBuilder(eventId, params);
+        return queryBuilder.find(ticketRepo).page(pageIndex, pageSize).list();
+    }
+
+    private QueryBuilder<Ticket> getQueryBuilder(String eventId, BookingSearchParams params) {
+        QueryBuilder<Ticket> queryBuilder = QueryBuilder.build();
+
+        queryBuilder.head("SELECT t FROM Ticket AS t, Booking AS b, BookingItem AS bi");
+
+        String term = params.term;
+        if(term != null && !term.isBlank()) {
+            queryBuilder.add(QueryCustomSection.of("LOWER(id) LIKE :term OR LOWER(customer.email) LIKE :term", Map.of("term", "%" + term + "%")));
+        }
+
+        LocalDate dateFrom = params.dateFrom;
+        if(dateFrom != null) {
+            queryBuilder.add(QuerySection.of("bookedAt", Compartor.GREATER_THAN_OR_EQUALS, params.dateFrom.atStartOfDay()));
+        }
+
+        LocalDate dateTo = params.dateTo;
+        if(dateTo != null) {
+            queryBuilder.add(QuerySection.of("bookedAt", Compartor.LESS_THAN, dateTo.plusDays(1).atStartOfDay()));
+        }
+
+        queryBuilder.add(QuerySection.of("totalPrice", Compartor.GREATER_THAN_OR_EQUALS, params.priceFrom));
+        queryBuilder.add(QuerySection.of("totalPrice", Compartor.LESS_THAN_OR_EQUALS, params.priceTo));
+
+        queryBuilder.add(QueryCustomSection.of("t.bookingItem = bi AND bi.booking = b AND b.eventId = :eventId", Map.of("eventId", eventId)));
+
+        return queryBuilder;
     }
 }

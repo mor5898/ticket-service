@@ -80,6 +80,13 @@ CREATE TABLE ticket (
     CONSTRAINT uq_public_id UNIQUE (id)
 );
 
+CREATE TABLE refund_link (
+     id VARCHAR(256),
+     booking_id VARCHAR(256),
+    CONSTRAINT pk_refund_link PRIMARY KEY (id),
+    CONSTRAINT fk_booking FOREIGN KEY (booking_id) REFERENCES booking(id)
+);
+
 CREATE TABLE cancellation (
     id VARCHAR(256),
     ticket_id VARCHAR(256),

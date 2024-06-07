@@ -1,6 +1,7 @@
 package com.benevolo.rest;
 
 import com.benevolo.entity.Ticket;
+import com.benevolo.rest.params.BookingSearchParams;
 import com.benevolo.service.TicketService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -36,5 +37,18 @@ public class TicketResource {
         return ticketService.findByBookingItemId(bookingItemId);
     }
 
+    @GET
+    @Path("/{pageIndex}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Ticket> findBySearch(@PathParam("pageIndex") int pageIndex, @QueryParam("eventId") String eventId, @BeanParam BookingSearchParams params) {
+        return ticketService.findBySearch(eventId, pageIndex, 15, params);
+    }
+
+    @GET
+    @Path("/public/{refundId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Ticket> findTicketsByBookingId(@PathParam("refundId") String refundId) {
+        return ticketService.findByRefundId(refundId);
+    }
 
 }
