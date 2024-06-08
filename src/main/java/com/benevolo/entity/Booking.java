@@ -36,7 +36,7 @@ public class Booking extends PanacheEntityBase {
     private List<BookingItem> bookingItems;
 
     @JoinColumn(name = "refund_link_id")
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private RefundLink refundLink;

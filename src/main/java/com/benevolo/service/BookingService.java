@@ -5,7 +5,6 @@ import com.benevolo.entity.Booking;
 import com.benevolo.entity.BookingItem;
 import com.benevolo.entity.RefundLink;
 import com.benevolo.repo.BookingRepo;
-import com.benevolo.repo.RefundLinkRepo;
 import com.benevolo.rest.params.BookingSearchParams;
 import com.benevolo.utils.query_builder.QueryBuilder;
 import com.benevolo.utils.query_builder.section.QueryCustomSection;
@@ -36,9 +35,6 @@ public class BookingService {
     @RestClient
     TicketTypeClient ticketTypeClient;
 
-    @Inject
-    RefundLinkRepo refundLinkRepo;
-
     @Transactional
     public Booking save(Booking booking) {
         for (BookingItem bookingItem : booking.getBookingItems()) {
@@ -53,9 +49,7 @@ public class BookingService {
         booking.setTotalPrice(calculateTotal(booking.getBookingItems()));
         Booking.persist(booking);
 
-        RefundLink refundLink = new RefundLink();
-
-        refundLinkRepo.persist(refundLink);
+        booking.setRefundLink(new RefundLink());
 
         return booking;
     }
