@@ -4,6 +4,7 @@ import com.benevolo.utils.TicketStatus;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.Random;
 
 @Entity
@@ -28,6 +29,13 @@ public class Ticket extends PanacheEntityBase {
     @ManyToOne
     @JoinColumn(name = "booking_item_id")
     private BookingItem bookingItem;
+
+    //Customer und bookedAt sind nicht Teil des Tickets und werden in der Resource aus der zugehörigen Buchung gezogen.
+    @Transient
+    private Customer customer;
+
+    @Transient
+    private LocalDateTime bookedAt;
 
     public Ticket() {
         // empty constructor
@@ -95,5 +103,21 @@ public class Ticket extends PanacheEntityBase {
             stringBuilder.append(alphabet.charAt(new Random().nextInt(alphabet.length())));
         }
         return stringBuilder.toString();
+    }
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
+    public LocalDateTime getBookedAt() {
+        return bookedAt;
+    }
+
+    public void setBookedAt(LocalDateTime bookedAt) {
+        this.bookedAt = bookedAt;
     }
 }

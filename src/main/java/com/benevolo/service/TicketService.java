@@ -14,6 +14,8 @@ import com.benevolo.utils.TicketStatus;
 import com.benevolo.utils.query_builder.QueryBuilder;
 import com.benevolo.utils.query_builder.section.QueryCustomSection;
 import com.benevolo.utils.query_builder.section.QuerySection;
+import com.benevolo.utils.query_builder.section.order_by.OrderBySection;
+import com.benevolo.utils.query_builder.section.order_by.OrderType;
 import com.benevolo.utils.query_builder.util.Compartor;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -114,7 +116,7 @@ public class TicketService {
 
     public List<Ticket> findBySearch(String eventId, int pageIndex, int pageSize, BookingSearchParams params) {
         QueryBuilder<Ticket> queryBuilder = getQueryBuilder(eventId, params);
-        return queryBuilder.find(ticketRepo).page(pageIndex, pageSize).list();
+        return queryBuilder.orderBy(OrderBySection.of("b.bookedAt", OrderType.DESC)).find(ticketRepo).page(pageIndex, pageSize).list();
     }
 
     private QueryBuilder<Ticket> getQueryBuilder(String eventId, BookingSearchParams params) {
@@ -124,7 +126,7 @@ public class TicketService {
 
         String term = params.term;
         if(term != null && !term.isBlank()) {
-            queryBuilder.add(QueryCustomSection.of("LOWER(id) LIKE :term OR LOWER(customer.email) LIKE :term", Map.of("term", "%" + term + "%")));
+            queryBuilder.add(QueryCustomSection.of("LOWER(t.publicId) LIKE :term OR LOWER(b.customer.email) LIKE :term", Map.of("term", "%" + term + "%")));
         }
 
         LocalDate dateFrom = params.dateFrom;
