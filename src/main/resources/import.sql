@@ -1,5 +1,9 @@
 /*Testdaten Generierung*/
 
+DROP SCHEMA IF EXISTS public CASCADE;
+
+CREATE SCHEMA public;
+
 CREATE TABLE person(
     id INTEGER,
     first_name VARCHAR(256),
@@ -50,14 +54,21 @@ CREATE TABLE customer (
     CONSTRAINT pk_customer PRIMARY KEY (id)
 );
 
+CREATE TABLE refund_link (
+     id VARCHAR(256),
+     CONSTRAINT pk_refund_link PRIMARY KEY (id)
+);
+
 CREATE TABLE booking (
     id VARCHAR(256),
     event_id VARCHAR(256),
     total_price INTEGER,
     booked_at TIMESTAMP,
     customer_id VARCHAR(256),
+    refund_link_id VARCHAR(256),
     CONSTRAINT pk_booking PRIMARY KEY (id),
-    CONSTRAINT fk_customer FOREIGN KEY (customer_id) REFERENCES customer(id)
+    CONSTRAINT fk_customer FOREIGN KEY (customer_id) REFERENCES customer(id),
+    CONSTRAINT fk_refund_link FOREIGN KEY (refund_link_id) REFERENCES refund_link(id)
 );
 
 CREATE TABLE booking_item (
@@ -78,13 +89,6 @@ CREATE TABLE ticket (
     booking_item_id VARCHAR(256),
     CONSTRAINT pk_ticket PRIMARY KEY (id),
     CONSTRAINT uq_public_id UNIQUE (id)
-);
-
-CREATE TABLE refund_link (
-     id VARCHAR(256),
-     booking_id VARCHAR(256),
-    CONSTRAINT pk_refund_link PRIMARY KEY (id),
-    CONSTRAINT fk_booking FOREIGN KEY (booking_id) REFERENCES booking(id)
 );
 
 CREATE TABLE cancellation (
