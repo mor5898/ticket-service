@@ -144,8 +144,15 @@ public class TicketService {
             queryBuilder.add(QuerySection.of("b.bookedAt", Compartor.LESS_THAN, dateTo.plusDays(1).atStartOfDay()));
         }
 
-        queryBuilder.add(QuerySection.of("b.totalPrice", Compartor.GREATER_THAN_OR_EQUALS, params.priceFrom));
-        queryBuilder.add(QuerySection.of("b.totalPrice", Compartor.LESS_THAN_OR_EQUALS, params.priceTo));
+        Integer priceFrom = params.priceFrom;
+        if(priceFrom != null) {
+            queryBuilder.add(QuerySection.of("t.price", Compartor.GREATER_THAN_OR_EQUALS, Math.round((priceFrom*1.0F)*100)));
+        }
+
+        Integer priceTo = params.priceTo;
+        if(priceTo != null) {
+            queryBuilder.add(QuerySection.of("t.price", Compartor.LESS_THAN_OR_EQUALS, Math.round((priceTo*1.0F)*100)));
+        }
 
         List<TicketStatus> status = params.status.stream().map(item -> TicketStatus.values()[item]).toList();
         if(!status.isEmpty()) {
