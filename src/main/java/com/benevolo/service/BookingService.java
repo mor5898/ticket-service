@@ -54,7 +54,7 @@ public class BookingService {
         Booking.persist(booking);
 
         RefundLink refundLink = new RefundLink();
-        refundLink.setBooking(booking);
+
         refundLinkRepo.persist(refundLink);
 
         return booking;
@@ -105,6 +105,10 @@ public class BookingService {
         queryBuilder.add(QuerySection.of("totalPrice", Compartor.LESS_THAN_OR_EQUALS, params.priceTo));
 
         return queryBuilder;
+    }
+
+    public RefundLink findRefundLinkByBooking(Booking booking) {
+        return booking.getRefundLink();
     }
 
 }

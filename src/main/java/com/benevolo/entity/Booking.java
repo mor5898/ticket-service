@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,7 +35,9 @@ public class Booking extends PanacheEntityBase {
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<BookingItem> bookingItems;
 
-    @OneToOne(mappedBy = "booking")
+    @JoinColumn(name = "refund_link_id")
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private RefundLink refundLink;
 

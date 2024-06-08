@@ -2,6 +2,8 @@ package com.benevolo.entity;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "refund_link")
 public class RefundLink {
@@ -10,9 +12,8 @@ public class RefundLink {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @JoinColumn(name = "booking_id")
-    @OneToOne
-    private Booking booking;
+    @OneToMany(mappedBy = "refundLink")
+    private List<Booking> bookings;
 
     public String getId() {
         return id;
@@ -22,11 +23,11 @@ public class RefundLink {
         this.id = id;
     }
 
-    public Booking getBooking() {
-        return booking;
+    public List<Booking> getBookings() {
+        return bookings;
     }
 
-    public void setBooking(Booking booking) {
-        this.booking = booking;
+    public void setBookings(List<Booking> bookings) {
+        this.bookings = bookings;
     }
 }

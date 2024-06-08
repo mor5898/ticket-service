@@ -106,7 +106,7 @@ public class TicketService {
 
     public List<Ticket> findByRefundId(String refundId) {
         List<Ticket> result = new LinkedList<>();
-        for(BookingItem bookingItem : bookingRepo.findById(refundLinkRepo.findById(refundId).getBooking().getId()).getBookingItems()) {
+        for(BookingItem bookingItem : refundLinkRepo.findById(refundId).getBookings().getFirst().getBookingItems()) {
             result.addAll(bookingItem.getTickets());
         }
         return result;
