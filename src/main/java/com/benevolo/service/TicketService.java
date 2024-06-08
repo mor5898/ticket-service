@@ -115,14 +115,19 @@ public class TicketService {
     }
 
     public List<Ticket> findBySearch(String eventId, int pageIndex, int pageSize, BookingSearchParams params) {
-        QueryBuilder<Ticket> queryBuilder = getQueryBuilder(eventId, params);
+        QueryBuilder<Ticket> queryBuilder = getQueryBuilder("SELECT t FROM Ticket AS t, Booking AS b, BookingItem AS bi", eventId, params);
         return queryBuilder.orderBy(OrderBySection.of("b.bookedAt", OrderType.DESC)).find(ticketRepo).page(pageIndex, pageSize).list();
     }
 
-    private QueryBuilder<Ticket> getQueryBuilder(String eventId, BookingSearchParams params) {
+    public Long countByEventIdAndSearch(String eventId, int pageSize, BookingSearchParams params) {
+        Long results = getQueryBuilder("SELECT COUNT(t) FROM Ticket AS t, Booking AS b, BookingItem AS bi", eventId, params).count(ticketRepo);
+        return (long) Math.ceil((results * 1.0) / pageSize);
+    }
+
+    private QueryBuilder<Ticket> getQueryBuilder(String head, String eventId, BookingSearchParams params) {
         QueryBuilder<Ticket> queryBuilder = QueryBuilder.build();
 
-        queryBuilder.head("SELECT t FROM Ticket AS t, Booking AS b, BookingItem AS bi");
+        queryBuilder.head(head);
 
         String term = params.term;
         if(term != null && !term.isBlank()) {
@@ -131,16 +136,21 @@ public class TicketService {
 
         LocalDate dateFrom = params.dateFrom;
         if(dateFrom != null) {
-            queryBuilder.add(QuerySection.of("bookedAt", Compartor.GREATER_THAN_OR_EQUALS, params.dateFrom.atStartOfDay()));
+            queryBuilder.add(QuerySection.of("b.bookedAt", Compartor.GREATER_THAN_OR_EQUALS, params.dateFrom.atStartOfDay()));
         }
 
         LocalDate dateTo = params.dateTo;
         if(dateTo != null) {
-            queryBuilder.add(QuerySection.of("bookedAt", Compartor.LESS_THAN, dateTo.plusDays(1).atStartOfDay()));
+            queryBuilder.add(QuerySection.of("b.bookedAt", Compartor.LESS_THAN, dateTo.plusDays(1).atStartOfDay()));
         }
 
-        queryBuilder.add(QuerySection.of("totalPrice", Compartor.GREATER_THAN_OR_EQUALS, params.priceFrom));
-        queryBuilder.add(QuerySection.of("totalPrice", Compartor.LESS_THAN_OR_EQUALS, params.priceTo));
+        queryBuilder.add(QuerySection.of("b.totalPrice", Compartor.GREATER_THAN_OR_EQUALS, params.priceFrom));
+        queryBuilder.add(QuerySection.of("b.totalPrice", Compartor.LESS_THAN_OR_EQUALS, params.priceTo));
+
+        List<TicketStatus> status = params.status.stream().map(item -> TicketStatus.values()[item]).toList();
+        if(!status.isEmpty()) {
+            queryBuilder.add(QueryCustomSection.of("t.status IN (:status)", Map.of("status", status)));
+        }
 
         queryBuilder.add(QueryCustomSection.of("t.bookingItem = bi AND bi.booking = b AND b.eventId = :eventId", Map.of("eventId", eventId)));
 

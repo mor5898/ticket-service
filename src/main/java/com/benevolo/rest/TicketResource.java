@@ -48,14 +48,16 @@ public class TicketResource {
     @Path("/search/{pageIndex}")
     @Produces(MediaType.APPLICATION_JSON)
     public List<Ticket> findBySearch(@PathParam("pageIndex") int pageIndex, @QueryParam("eventId") String eventId, @BeanParam BookingSearchParams params, @Context HttpServerResponse httpServerResponse) {
-        List<Ticket> result = ticketService.findBySearch(eventId, pageIndex, 15, params);
+        final int PAGE_SIZE = 15;
+
+        List<Ticket> result = ticketService.findBySearch(eventId, pageIndex, PAGE_SIZE, params);
         result.forEach(item -> {
             item.getBookingItem().setTicketType(ticketTypeClient.findById(item.getBookingItem().getTicketTypeId()));
             item.setCustomer(item.getBookingItem().getBooking().getCustomer());
             item.setBookedAt(item.getBookingItem().getBooking().getBookedAt());
         });
 
-        httpServerResponse.headers().add("X-Page-Size", String.valueOf(69));
+        httpServerResponse.headers().add("X-Page-Size", String.valueOf(ticketService.countByEventIdAndSearch(eventId, PAGE_SIZE, params)));
 
         return result;
     }
