@@ -2,8 +2,10 @@ package com.benevolo.service;
 
 import com.benevolo.entity.Booking;
 import com.benevolo.entity.Cancellation;
-import com.benevolo.entity.Ticket;
 import com.benevolo.repo.CancellationRepo;
+import com.benevolo.repo.RefundLinkRepo;
+import com.benevolo.repo.TicketRepo;
+import com.benevolo.utils.CancellationStatus;
 import com.benevolo.utils.TicketStatus;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -19,6 +21,15 @@ public class CancellationService {
     @Inject
     CancellationRepo cancellationRepo;
 
+    @Inject
+    RefundLinkService refundLinkService;
+
+    @Inject
+    RefundLinkRepo refundLinkRepo;
+
+    @Inject
+    TicketRepo ticketRepo;
+
     @Transactional
     public Cancellation changeCancellationStatus(String cancellationId, boolean isApproved) {
         Cancellation cancellation = Cancellation.findById(cancellationId);
@@ -26,28 +37,26 @@ public class CancellationService {
             throw new NotFoundException("Cancellation with ID " + cancellationId + " not found");
         }
         if (isApproved) {
-            cancellation.setStatus(TicketStatus.REDEEMED);
+            cancellation.setStatus(CancellationStatus.ACCEPTED);
         } else {
-            cancellation.setStatus(TicketStatus.CANCELLED);
+            cancellation.setStatus(CancellationStatus.DECLINED);
         }
         cancellation.persist();
         return cancellation;
     }
 
     @Transactional
-    public Cancellation save(Cancellation cancellation, String bookingId) {
-        Ticket ticket = Ticket.findById(cancellation.getTicket().getId());
-        Booking booking = Booking.findById(bookingId);
-        if (booking != null && ticket != null) {
-            cancellation.setTicket(ticket);
-            cancellation.setBooking(booking);
-            cancellation.setRequestedAt(LocalDateTime.now());
-            cancellation.setStatus(TicketStatus.PENDING);
-            cancellation.persist();
-            return cancellation;
-        } else {
-            throw new RuntimeException("The supplied ticketId or bookingId does not exist!");
-        }
+    public void save(List<String> ticketIds, String refundId) {
+        ticketIds.forEach(ticket -> cancelTicket(ticket, refundId));
+    }
+
+    private void cancelTicket(String id, String refundId) {
+        Cancellation cancellation = new Cancellation();
+        cancellation.setBooking(refundLinkRepo.findById(refundId).getBookings().getFirst());
+        cancellation.setRequestedAt(LocalDateTime.now());
+        cancellation.setTicket(ticketRepo.findById(id));
+        cancellation.setStatus(CancellationStatus.PENDING);
+        cancellation.persist();
     }
 
     public List<Cancellation> getAllCancellations() {
