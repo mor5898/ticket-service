@@ -25,17 +25,17 @@ public class TicketTypeClientMock implements QuarkusTestResourceLifecycleManager
     public TicketTypeClientMock() {
         ticketTypes = new LinkedList<>();
         ticketTypes.add(new TicketType(
-                "78938",
+                "02e6ee0d-4a79-4d20-a115-eb389b50175c",
                 2100,
                 19,
                 "Samstagsticket",
                 LocalDateTime.now(),
                 LocalDateTime.now(),
-                false,
+                true,
                 new Event("event_id", "Test Event", new Address("Ingolstädter Straße", "Ingolstadt", "Bayern", "85049"), false)
         ));
         ticketTypes.add(new TicketType(
-                "34932",
+                "439575ed-8691-4fe1-97ff-e73332d0a379",
                 2300,
                 19,
                 "Sonntagsticket",
@@ -45,7 +45,7 @@ public class TicketTypeClientMock implements QuarkusTestResourceLifecycleManager
                 new Event("event_id", "Test Event", new Address("Ingolstädter Straße", "Ingolstadt", "Bayern", "85290"), false)
         ));
         ticketTypes.add(new TicketType(
-                "48935",
+                "a0f22577-6231-4323-afee-1847d6c53278",
                 4500,
                 19,
                 "Wochenendticket",
