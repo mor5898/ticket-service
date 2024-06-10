@@ -31,7 +31,8 @@ public class TicketTypeClientMock implements QuarkusTestResourceLifecycleManager
                 "Samstagsticket",
                 LocalDateTime.now(),
                 LocalDateTime.now(),
-                new Event("event_id","Test Event", new Address("Ingolstädter Straße", "Ingolstadt", "Bayern", "85049"))
+                false,
+                new Event("event_id", "Test Event", new Address("Ingolstädter Straße", "Ingolstadt", "Bayern", "85049"), false)
         ));
         ticketTypes.add(new TicketType(
                 "34932",
@@ -40,7 +41,8 @@ public class TicketTypeClientMock implements QuarkusTestResourceLifecycleManager
                 "Sonntagsticket",
                 LocalDateTime.now(),
                 LocalDateTime.now(),
-                new Event("event_id","Test Event", new Address("Ingolstädter Straße", "Ingolstadt", "Bayern", "85290"))
+                false,
+                new Event("event_id", "Test Event", new Address("Ingolstädter Straße", "Ingolstadt", "Bayern", "85290"), false)
         ));
         ticketTypes.add(new TicketType(
                 "48935",
@@ -49,7 +51,8 @@ public class TicketTypeClientMock implements QuarkusTestResourceLifecycleManager
                 "Wochenendticket",
                 LocalDateTime.now(),
                 LocalDateTime.now(),
-                new Event("event_id","Test Event",new Address("Ingolstädter Straße", "Ingolstadt", "Bayern", "85119"))
+                false,
+                new Event("event_id", "Test Event", new Address("Ingolstädter Straße", "Ingolstadt", "Bayern", "85119"), false)
         ));
     }
 

@@ -10,19 +10,22 @@ public class TicketType {
     private String name;
     private LocalDateTime validFrom;
     private LocalDateTime validTo;
+    private Boolean entryStarted;
     private Event event;
 
     public TicketType() {
     }
 
-    public TicketType(String id, int price, int taxRate, String name, LocalDateTime validFrom, LocalDateTime validTo, Event event) {
+    public TicketType(String id, int price, int taxRate, String name, LocalDateTime validFrom, LocalDateTime validTo, Boolean entryStarted, Event event) {
         this.id = id;
         this.price = price;
         this.taxRate = taxRate;
         this.name = name;
         this.validFrom = validFrom;
         this.validTo = validTo;
+        this.entryStarted = entryStarted;
         this.event = event;
+
     }
 
     public String getId() {
@@ -71,6 +74,14 @@ public class TicketType {
 
     public LocalDateTime getValidTo() {
         return validTo;
+    }
+
+    public Boolean getEntryStarted() {
+        return entryStarted;
+    }
+
+    public void setEntryStarted(Boolean entryStarted) {
+        this.entryStarted = entryStarted;
     }
 
     public Event getEvent() {
