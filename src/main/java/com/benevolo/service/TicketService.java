@@ -59,7 +59,8 @@ public class TicketService {
     @Transactional
     public void redeemTicket(String ticketId) {
         Ticket ticket = ticketRepo.findById(ticketId);
-        if (ticket.getStatus() == TicketStatus.VALID) {
+        TicketType ticketType = ticketTypeClient.findById(ticket.getBookingItem().getTicketTypeId());
+        if (ticket.getStatus() == TicketStatus.VALID && ticketType.getEntryStarted()) {
             ticket.setStatus(TicketStatus.REDEEMED);
             ticketRepo.persist(ticket);
             // Save Analytics data and get event id for Ticket
@@ -108,7 +109,7 @@ public class TicketService {
 
     public List<Ticket> findByRefundId(String refundId) {
         List<Ticket> result = new LinkedList<>();
-        for(BookingItem bookingItem : refundLinkRepo.findById(refundId).getBookings().getFirst().getBookingItems()) {
+        for (BookingItem bookingItem : refundLinkRepo.findById(refundId).getBookings().getFirst().getBookingItems()) {
             result.addAll(bookingItem.getTickets());
         }
         return result;
@@ -130,32 +131,32 @@ public class TicketService {
         queryBuilder.head(head);
 
         String term = params.term;
-        if(term != null && !term.isBlank()) {
+        if (term != null && !term.isBlank()) {
             queryBuilder.add(QueryCustomSection.of("LOWER(t.publicId) LIKE :term OR LOWER(b.customer.email) LIKE :term", Map.of("term", "%" + term + "%")));
         }
 
         LocalDate dateFrom = params.dateFrom;
-        if(dateFrom != null) {
+        if (dateFrom != null) {
             queryBuilder.add(QuerySection.of("b.bookedAt", Compartor.GREATER_THAN_OR_EQUALS, params.dateFrom.atStartOfDay()));
         }
 
         LocalDate dateTo = params.dateTo;
-        if(dateTo != null) {
+        if (dateTo != null) {
             queryBuilder.add(QuerySection.of("b.bookedAt", Compartor.LESS_THAN, dateTo.plusDays(1).atStartOfDay()));
         }
 
         Integer priceFrom = params.priceFrom;
-        if(priceFrom != null) {
-            queryBuilder.add(QuerySection.of("t.price", Compartor.GREATER_THAN_OR_EQUALS, Math.round((priceFrom*1.0F)*100)));
+        if (priceFrom != null) {
+            queryBuilder.add(QuerySection.of("t.price", Compartor.GREATER_THAN_OR_EQUALS, Math.round((priceFrom * 1.0F) * 100)));
         }
 
         Integer priceTo = params.priceTo;
-        if(priceTo != null) {
-            queryBuilder.add(QuerySection.of("t.price", Compartor.LESS_THAN_OR_EQUALS, Math.round((priceTo*1.0F)*100)));
+        if (priceTo != null) {
+            queryBuilder.add(QuerySection.of("t.price", Compartor.LESS_THAN_OR_EQUALS, Math.round((priceTo * 1.0F) * 100)));
         }
 
         List<TicketStatus> status = params.status.stream().map(item -> TicketStatus.values()[item]).toList();
-        if(!status.isEmpty()) {
+        if (!status.isEmpty()) {
             queryBuilder.add(QueryCustomSection.of("t.status IN (:status)", Map.of("status", status)));
         }
 

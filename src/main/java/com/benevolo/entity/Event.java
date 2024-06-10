@@ -5,6 +5,7 @@ public class Event {
     private String id;
     private String eventName;
     private Address address;
+    private Boolean entryStarted;
 
     public Event() {
     }
@@ -13,10 +14,11 @@ public class Event {
         this.id = eventId;
     }
 
-    public Event(String eventId, String eventName, Address address) {
+    public Event(String eventId, String eventName, Address address, Boolean entryStarted) {
         this.id = eventId;
         this.eventName = eventName;
         this.address = address;
+        this.entryStarted = entryStarted;
     }
 
     public String getId() {
@@ -41,6 +43,14 @@ public class Event {
 
     public void setAddress(Address address) {
         this.address = address;
+    }
+
+    public boolean isEntryStarted() {
+        return entryStarted;
+    }
+
+    public void setEntryStarted(boolean entryStarted) {
+        this.entryStarted = entryStarted;
     }
 
 }
