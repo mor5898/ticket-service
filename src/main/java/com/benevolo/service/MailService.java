@@ -17,6 +17,11 @@ public class MailService {
     @Inject
     Mailer mailer;
 
+    @Inject
+    RefundLinkService refundLinkService;
+
+    private static final String BENEVOLO_REFUND_URL = "https://shop.benevolo.de/refund/?";
+
     public void sendEmailWithPdf(PDDocument pdf, String bookingId) throws IOException {
         try (ByteArrayOutputStream ticketOutputStream = new ByteArrayOutputStream()) {
             pdf.save(ticketOutputStream);
@@ -26,7 +31,9 @@ public class MailService {
             mailer.send(
                     Mail.withText(customer.getEmail(),
                             "Tickets Benevolo Shop",
-                            "Ihre Tickets sind im Anhang zu finden. :)"
+                            "Ihre Tickets sind im Anhang zu finden. \n \n" +
+                                    "Sie können die Tickets zu ihrer Bestellung unter folgendem Link stornieren: \n" +
+                                    BENEVOLO_REFUND_URL + refundLinkService.findIdByBookingId(bookingId)
                     ).addAttachment("ticket.pdf",
                             ticketOutputStream.toByteArray(),
                             "application/pdf")

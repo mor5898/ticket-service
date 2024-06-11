@@ -3,6 +3,7 @@ package com.benevolo.service;
 import com.benevolo.client.TicketTypeClient;
 import com.benevolo.entity.Booking;
 import com.benevolo.entity.BookingItem;
+import com.benevolo.entity.RefundLink;
 import com.benevolo.repo.BookingRepo;
 import com.benevolo.rest.params.BookingSearchParams;
 import com.benevolo.utils.query_builder.QueryBuilder;
@@ -47,6 +48,9 @@ public class BookingService {
         }
         booking.setTotalPrice(calculateTotal(booking.getBookingItems()));
         Booking.persist(booking);
+
+        booking.setRefundLink(new RefundLink());
+
         return booking;
     }
 
@@ -91,10 +95,21 @@ public class BookingService {
             queryBuilder.add(QuerySection.of("bookedAt", Compartor.LESS_THAN, dateTo.plusDays(1).atStartOfDay()));
         }
 
-        queryBuilder.add(QuerySection.of("totalPrice", Compartor.GREATER_THAN_OR_EQUALS, params.priceFrom));
-        queryBuilder.add(QuerySection.of("totalPrice", Compartor.LESS_THAN_OR_EQUALS, params.priceTo));
+        Integer priceFrom = params.priceFrom;
+        if(priceFrom != null) {
+            queryBuilder.add(QuerySection.of("totalPrice", Compartor.GREATER_THAN_OR_EQUALS, Math.round((priceFrom*1.0F)*100)));
+        }
+
+        Integer priceTo = params.priceTo;
+        if(priceTo != null) {
+            queryBuilder.add(QuerySection.of("totalPrice", Compartor.LESS_THAN_OR_EQUALS, Math.round((priceTo*1.0F)*100)));
+        }
 
         return queryBuilder;
+    }
+
+    public RefundLink findRefundLinkByBooking(Booking booking) {
+        return booking.getRefundLink();
     }
 
 }

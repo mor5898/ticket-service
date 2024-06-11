@@ -38,7 +38,7 @@ class BookingSearchTest {
     @Test
     void test() throws IOException {
         {
-            ResponseOptions<Response> response = given().get("/bookings/0?eventId=event_id&priceFrom=8500&priceTo=10500");
+            ResponseOptions<Response> response = given().get("/bookings/0?eventId=event_id&priceFrom=85&priceTo=105");
             assertThat(responseToBookings(response).size(), is(3));
         }
         {

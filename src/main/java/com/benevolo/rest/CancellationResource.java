@@ -9,7 +9,7 @@ import jakarta.ws.rs.core.MediaType;
 
 import java.util.List;
 
-@Path("/cancellation")
+@Path("/cancellations")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class CancellationResource {
@@ -23,9 +23,9 @@ public class CancellationResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/{bookingId}")
-    public Cancellation post(@PathParam("bookingId") String bookingId, Cancellation cancellation) {
-        return cancellationService.save(cancellation, bookingId);
+    @Path("/{refundId}")
+    public void post(@PathParam("refundId") String refundId, List<String> ticketIds) {
+        cancellationService.save(ticketIds, refundId);
     }
 
     @GET

@@ -1,6 +1,6 @@
 package com.benevolo.entity;
 
-import com.benevolo.utils.TicketStatus;
+import com.benevolo.utils.CancellationStatus;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 
@@ -25,7 +25,7 @@ public class Cancellation extends PanacheEntityBase {
     private LocalDateTime requestedAt;
 
     @Enumerated(EnumType.STRING)
-    private TicketStatus status;
+    private CancellationStatus status;
 
 
     public void setId(String id) {
@@ -48,7 +48,7 @@ public class Cancellation extends PanacheEntityBase {
         this.requestedAt = requestedAt;
     }
 
-    public void setStatus(TicketStatus status) {
+    public void setStatus(CancellationStatus status) {
         this.status = status;
     }
 
@@ -60,7 +60,7 @@ public class Cancellation extends PanacheEntityBase {
         return requestedAt;
     }
 
-    public TicketStatus getStatus() {
+    public CancellationStatus getStatus() {
         return status;
     }
 

@@ -1,8 +1,11 @@
 package com.benevolo.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,6 +34,12 @@ public class Booking extends PanacheEntityBase {
     @JsonManagedReference(value="booking-item")
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<BookingItem> bookingItems;
+
+    @JoinColumn(name = "refund_link_id")
+    @ManyToOne(cascade = CascadeType.ALL)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonIgnore
+    private RefundLink refundLink;
 
     public String getId() {
         return id;
@@ -78,5 +87,13 @@ public class Booking extends PanacheEntityBase {
 
     public void setTotalPrice(int totalPrice) {
         this.totalPrice = totalPrice;
+    }
+
+    public RefundLink getRefundLink() {
+        return refundLink;
+    }
+
+    public void setRefundLink(RefundLink refundLink) {
+        this.refundLink = refundLink;
     }
 }

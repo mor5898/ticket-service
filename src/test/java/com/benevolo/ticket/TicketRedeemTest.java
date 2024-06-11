@@ -3,6 +3,7 @@ package com.benevolo.ticket;
 import com.benevolo.entity.Booking;
 import com.benevolo.entity.BookingItem;
 import com.benevolo.entity.Ticket;
+import com.benevolo.entity.TicketType;
 import com.benevolo.includes.mocks.AnalyticsClientMock;
 import com.benevolo.includes.mocks.TicketTypeClientMock;
 import com.benevolo.repo.BookingItemRepo;
@@ -93,6 +94,7 @@ class TicketRedeemTest {
         bookingItem.setQuantity(3);
         bookingItem.setId("12345");
         bookingItem.setBooking(booking);
+        bookingItem.setTicketTypeId("02e6ee0d-4a79-4d20-a115-eb389b50175c");
         bookingItem = em.merge(bookingItem);
         bookingItemRepo.persist(bookingItem);
 
