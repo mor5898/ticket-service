@@ -1,11 +1,13 @@
 package com.benevolo.rest;
 
+import com.benevolo.client.TicketTypeClient;
 import com.benevolo.entity.Cancellation;
 import com.benevolo.repo.CancellationRepo;
 import com.benevolo.service.CancellationService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import java.util.List;
 
@@ -20,6 +22,9 @@ public class CancellationResource {
     @Inject
     CancellationRepo cancellationRepo;
 
+    @RestClient
+    TicketTypeClient ticketTypeClient;
+
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -32,7 +37,14 @@ public class CancellationResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{eventId}")
     public List<Cancellation> getCancellationsForEvent(@PathParam("eventId") String eventId) {
-        return cancellationRepo.findAllByEventId(eventId);
+        
+        List<Cancellation> result = cancellationRepo.findAllByEventId(eventId);
+        result.forEach(item -> {
+            item.getTicket().getBookingItem().setTicketType(ticketTypeClient.findById(item.getTicket().getBookingItem().getTicketTypeId()));
+        }); 
+
+        return result;
+        //return cancellationRepo.findAllByEventId(eventId);
     }
 
     @GET
