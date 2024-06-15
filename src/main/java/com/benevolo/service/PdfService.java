@@ -84,7 +84,10 @@ public class PdfService {
             addText(contentStream, font, 16, 27, startY - 20, ticketType.getEvent().getAddress().getCity());
 
             // Preis des Tickets
-            addText(contentStream, font, 16, 27, startY - 60, String.valueOf(ticket.getPrice()) + " EUR");
+            String formattedPrice = String.format("%03d", ticket.getPrice());
+            int length = formattedPrice.length();
+            String euroString = formattedPrice.substring(0, length - 2) + "," + formattedPrice.substring(length - 2);
+            addText(contentStream, font, 16, 27, startY - 60, euroString + " EUR");
 
             // Tickettyp
             addText(contentStream, font, 12, 27, startY - 80, ticketType.getName());
