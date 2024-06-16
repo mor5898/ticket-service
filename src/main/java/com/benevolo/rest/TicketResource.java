@@ -4,8 +4,6 @@ import com.benevolo.client.TicketTypeClient;
 import com.benevolo.entity.Ticket;
 import com.benevolo.rest.params.BookingSearchParams;
 import com.benevolo.service.TicketService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.vertx.core.http.HttpServerResponse;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -41,11 +39,11 @@ public class TicketResource {
     }
 
     @PUT
-    @Path("/status")
+    @Path("/{ticketId}/status/cancelled")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public void cancelTicket(String body) throws JsonProcessingException {
-        ticketService.cancelTicket(new ObjectMapper().readTree(body).get("ticketId").asText());
+    public void cancelTicket(@PathParam("ticketId") String ticketId) {
+        ticketService.cancelTicket(ticketId);
     }
 
     @GET
