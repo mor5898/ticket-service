@@ -76,6 +76,10 @@ public class TicketResource {
     @Path("/public/{refundId}")
     @Produces(MediaType.APPLICATION_JSON)
     public List<Ticket> findTicketsByBookingId(@PathParam("refundId") String refundId) {
+        List<Ticket> tickets = ticketService.findByRefundId(refundId);
+        tickets.forEach(ticket -> {
+            ticket.getBookingItem().setTicketType(ticketTypeClient.findById(ticket.getBookingItem().getTicketTypeId()));
+        });
         return ticketService.findByRefundId(refundId);
     }
 
