@@ -71,6 +71,17 @@ public class TicketService {
         throw new BadRequestException(Response.ok("invalid_ticket_status").status(400).build());
     }
 
+    @Transactional
+    public void cancelTicket(String ticketId) {
+        Ticket ticket = ticketRepo.findById(ticketId);
+        if (ticket.getStatus() == TicketStatus.VALID && !ticket.getCancellations().isEmpty()) {
+            ticket.setStatus(TicketStatus.CANCELLED);
+            ticketRepo.persist(ticket);
+            return;
+        }
+        throw new BadRequestException(Response.ok("invalid_ticket_status").status(400).build());
+    }
+
     public Ticket generateTicket(BookingItem bookingItem) {
         TicketType ticketType = ticketTypeClient.findById(bookingItem.getTicketTypeId());
         return new Ticket(TicketStatus.VALID, ticketType.getPrice(), ticketType.getTaxRate());
