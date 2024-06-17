@@ -39,9 +39,9 @@ public class MailResource {
     }
 
     @POST
-    @Path("/cancellation/approval/{ticketId}")
+    @Path("/cancellation/approval")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void sendCancellationApproval(@PathParam("ticketId") String ticketId) throws WebApplicationException {
+    public void sendCancellationApproval(String ticketId) throws WebApplicationException {
         try {
             mailService.sendCancellation(ticketId, true);
         } catch (Exception e) {
@@ -52,9 +52,9 @@ public class MailResource {
     }
 
     @POST
-    @Path("/cancellation/rejection/{ticketId}")
+    @Path("/cancellation/rejection")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void sendCancellationRejection(@PathParam("ticketId") String ticketId) throws WebApplicationException {
+    public void sendCancellationRejection(String ticketId) throws WebApplicationException {
         try {
             mailService.sendCancellation(ticketId, false);
         } catch (Exception e) {
