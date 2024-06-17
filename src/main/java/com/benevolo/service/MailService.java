@@ -42,10 +42,10 @@ public class MailService {
         }
     }
 
-    public void sendCancellation(List<String> ticketIds, boolean isApproved) {
-        Ticket ticket = Ticket.findById(ticketIds.getFirst());
+    public void sendCancellation(String ticketId, boolean isApproved) {
+        Ticket ticket = Ticket.findById(ticketId);
         Customer customer = ticket.getBookingItem().getBooking().getCustomer();
-        String emailText = "Die Stornierung ihrer Tickets konnte " + (isApproved ? "erfolgreich" : "nicht erfolgreich") +
+        String emailText = "Die Stornierung ihrers Ticket konnte " + (isApproved ? "erfolgreich" : "nicht erfolgreich") +
                 " durchgeführt werden. Bei weiteren Fragen, wenden sie sich bitte an den Benevolo-Support.";
         mailer.send(
                 Mail.withText(customer.getEmail(),
