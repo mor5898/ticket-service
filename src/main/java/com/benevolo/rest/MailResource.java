@@ -10,6 +10,8 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.jboss.logmanager.Level;
+
+import java.util.List;
 import java.util.logging.Logger;
 
 @Path("/mail")
@@ -39,11 +41,11 @@ public class MailResource {
     }
 
     @POST
-    @Path("/cancellation/approval/{ticketId}")
+    @Path("/cancellation/approval")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void sendCancellationApproval(@PathParam("ticketId") String ticketId) throws WebApplicationException {
+    public void sendCancellationApproval(List<String> ticketIds) throws WebApplicationException {
         try {
-            mailService.sendCancellation(ticketId, true);
+            mailService.sendCancellation(ticketIds, true);
         } catch (Exception e) {
             String msg = "Error while sending cancellation approval";
             LOGGER.log(Level.SEVERE, msg, e);
@@ -52,11 +54,11 @@ public class MailResource {
     }
 
     @POST
-    @Path("/cancellation/rejection/{ticketId}")
+    @Path("/cancellation/rejection")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void sendCancellationRejection(@PathParam("ticketId") String ticketId) throws WebApplicationException {
+    public void sendCancellationRejection(List<String> ticketIds) throws WebApplicationException {
         try {
-            mailService.sendCancellation(ticketId, false);
+            mailService.sendCancellation(ticketIds, false);
         } catch (Exception e) {
             String msg = "Error while sending cancellation rejection";
             LOGGER.log(Level.SEVERE, msg, e);
