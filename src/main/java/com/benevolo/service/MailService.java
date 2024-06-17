@@ -10,6 +10,7 @@ import jakarta.inject.Inject;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 @ApplicationScoped
 public class MailService {
@@ -41,11 +42,10 @@ public class MailService {
         }
     }
 
-    public void sendCancellation(String ticketId, boolean isApproved) {
-        Ticket ticket = Ticket.findById(ticketId);
+    public void sendCancellation(List<String> ticketIds, boolean isApproved) {
+        Ticket ticket = Ticket.findById(ticketIds.getFirst());
         Customer customer = ticket.getBookingItem().getBooking().getCustomer();
-        String emailText = "Die Stornierung ihres Ticket (id: " + ticket.getId() +
-                ") konnte " + (isApproved ? "erfolgreich" : "nicht erfolgreich") +
+        String emailText = "Die Stornierung ihrer Tickets konnte " + (isApproved ? "erfolgreich" : "nicht erfolgreich") +
                 " durchgeführt werden. Bei weiteren Fragen, wenden sie sich bitte an den Benevolo-Support.";
         mailer.send(
                 Mail.withText(customer.getEmail(),
