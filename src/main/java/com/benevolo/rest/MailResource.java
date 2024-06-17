@@ -43,9 +43,9 @@ public class MailResource {
     @POST
     @Path("/cancellation/approval")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void sendCancellationApproval(List<String> ticketIds) throws WebApplicationException {
+    public void sendCancellationApproval(Ticket ticket) throws WebApplicationException {
         try {
-            mailService.sendCancellation(ticketIds, true);
+            mailService.sendCancellation(ticket, true);
         } catch (Exception e) {
             String msg = "Error while sending cancellation approval";
             LOGGER.log(Level.SEVERE, msg, e);
@@ -56,9 +56,9 @@ public class MailResource {
     @POST
     @Path("/cancellation/rejection")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void sendCancellationRejection(List<String> ticketIds) throws WebApplicationException {
+    public void sendCancellationRejection(Ticket ticket) throws WebApplicationException {
         try {
-            mailService.sendCancellation(ticketIds, false);
+            mailService.sendCancellation(ticket, false);
         } catch (Exception e) {
             String msg = "Error while sending cancellation rejection";
             LOGGER.log(Level.SEVERE, msg, e);
