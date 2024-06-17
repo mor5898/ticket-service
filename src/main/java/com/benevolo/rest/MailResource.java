@@ -41,11 +41,11 @@ public class MailResource {
     }
 
     @POST
-    @Path("/cancellation/approval")
+    @Path("/cancellation/approval/{ticketId}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void sendCancellationApproval(Ticket ticket) throws WebApplicationException {
+    public void sendCancellationApproval(@PathParam("ticketId") String ticketId) throws WebApplicationException {
         try {
-            mailService.sendCancellation(ticket, true);
+            mailService.sendCancellation(ticketId, true);
         } catch (Exception e) {
             String msg = "Error while sending cancellation approval";
             LOGGER.log(Level.SEVERE, msg, e);
@@ -54,11 +54,11 @@ public class MailResource {
     }
 
     @POST
-    @Path("/cancellation/rejection")
+    @Path("/cancellation/rejection/{ticketId}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void sendCancellationRejection(Ticket ticket) throws WebApplicationException {
+    public void sendCancellationRejection(@PathParam("ticketId") String ticketId) throws WebApplicationException {
         try {
-            mailService.sendCancellation(ticket, false);
+            mailService.sendCancellation(ticketId, false);
         } catch (Exception e) {
             String msg = "Error while sending cancellation rejection";
             LOGGER.log(Level.SEVERE, msg, e);

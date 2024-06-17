@@ -42,7 +42,8 @@ public class MailService {
         }
     }
 
-    public void sendCancellation(Ticket ticket, boolean isApproved) {
+    public void sendCancellation(String ticketId, boolean isApproved) {
+        Ticket ticket = Ticket.findById(ticketId);
         Customer customer = ticket.getBookingItem().getBooking().getCustomer();
         String emailText = "Die Stornierung ihrer Tickets konnte " + (isApproved ? "erfolgreich" : "nicht erfolgreich") +
                 " durchgeführt werden. Bei weiteren Fragen, wenden sie sich bitte an den Benevolo-Support.";
