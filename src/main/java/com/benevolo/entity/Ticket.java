@@ -1,6 +1,8 @@
 package com.benevolo.entity;
 
 import com.benevolo.utils.TicketStatus;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 
@@ -38,6 +40,7 @@ public class Ticket extends PanacheEntityBase {
     @Transient
     private LocalDateTime bookedAt;
 
+    @JsonBackReference
     @OneToMany(mappedBy = "ticket")
     private List<Cancellation> cancellations;
 
