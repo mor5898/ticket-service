@@ -37,14 +37,18 @@ public class CancellationResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{eventId}")
     public List<Cancellation> getCancellationsForEvent(@PathParam("eventId") String eventId) {
-        
+        /*
         List<Cancellation> result = cancellationRepo.findAllByEventId(eventId);
         result.forEach(item -> {
             item.getTicket().getBookingItem().setTicketType(ticketTypeClient.findById(item.getTicket().getBookingItem().getTicketTypeId()));
         }); 
 
         return result;
-        //return cancellationRepo.findAllByEventId(eventId);
+         * 
+         * 
+         */
+        
+        return cancellationRepo.findAllByEventId(eventId);
     }
 
     @GET
