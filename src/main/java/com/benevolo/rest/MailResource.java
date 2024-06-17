@@ -45,7 +45,7 @@ public class MailResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public void sendCancellationApproval(String ticketId) throws WebApplicationException {
         try {
-            mailService.sendCancellation(ticketIds, true);
+            mailService.sendCancellation(ticketId, true);
         } catch (Exception e) {
             String msg = "Error while sending cancellation approval";
             LOGGER.log(Level.SEVERE, msg, e);
