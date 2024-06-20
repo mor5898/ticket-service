@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{emailSubject}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border: 1px solid #e0e0e0;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 24px;
+            color: #333333;
+        }
+        .content {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #555555;
+        }
+        .content pre {
+            white-space: pre-wrap;
+            font-family: inherit;
+        }
+        .footer {
+            border-top: 1px solid #e0e0e0;
+            padding-top: 10px;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #888888;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>{headline}</h1>
+    </div>
+    <div class="content">
+        <pre>{content}</pre>
+    </div>
+    <div class="footer">
+        <p>&copy; 2024 Example GmbH. All rights reserved.</p>
+    </div>
+</div>
+</body>
+</html>

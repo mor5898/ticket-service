@@ -1,17 +1,15 @@
 package com.benevolo.rest;
 
 import com.benevolo.entity.Booking;
-import com.benevolo.entity.Ticket;
 import com.benevolo.service.MailService;
 import com.benevolo.service.PdfService;
+import com.benevolo.utils.EmailBuilder;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.jboss.logmanager.Level;
-
-import java.util.List;
 import java.util.logging.Logger;
 
 @Path("/mail")
@@ -26,6 +24,12 @@ public class MailResource {
 
     @Inject
     MailService mailService;
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void send(EmailBuilder emailBuilder) {
+        mailService.send(emailBuilder);
+    }
 
     @POST
     @Path("/tickets")

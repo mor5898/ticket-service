@@ -3,8 +3,11 @@ package com.benevolo.service;
 import com.benevolo.entity.Booking;
 import com.benevolo.entity.Customer;
 import com.benevolo.entity.Ticket;
+import com.benevolo.utils.EmailBuilder;
 import io.quarkus.mailer.Mail;
 import io.quarkus.mailer.Mailer;
+import io.quarkus.qute.Template;
+import io.quarkus.qute.TemplateInstance;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -20,6 +23,9 @@ public class MailService {
 
     @Inject
     RefundLinkService refundLinkService;
+
+    @Inject
+    Template emailTemplate;
 
     private static final String BENEVOLO_REFUND_URL = "https://shop.benevolo.de/refund/?";
 
@@ -52,6 +58,19 @@ public class MailService {
                         "Stornierung Ticket Benevolo Shop",
                         emailText
                 )
+        );
+    }
+
+    public void send(EmailBuilder emailBuilder) {
+        TemplateInstance templateInstance = emailTemplate
+                .data("headline", emailBuilder.getHeadline())
+                .data("emailSubject", emailBuilder.getSubject())
+                .data("content", emailBuilder.getContent());
+
+        String renderedContent = templateInstance.render();
+
+        mailer.send(
+                Mail.withHtml(emailBuilder.getRecipientEmail(), emailBuilder.getSubject(), renderedContent)
         );
     }
 }
