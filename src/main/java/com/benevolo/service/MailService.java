@@ -34,7 +34,8 @@ public class MailService {
         TemplateInstance templateInstance = emailTemplate
                 .data("headline", emailBuilder.getHeadline())
                 .data("emailSubject", emailBuilder.getSubject())
-                .data("content", emailBuilder.getContent());
+                .data("content", emailBuilder.getContent())
+                .data("refundLink", "");
 
         String renderedContent = templateInstance.render();
 
