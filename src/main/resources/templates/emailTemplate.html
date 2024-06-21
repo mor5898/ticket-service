@@ -36,6 +36,17 @@
             white-space: pre-wrap;
             font-family: inherit;
         }
+        .link {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .link a {
+            color: #1a73e8;
+            text-decoration: none;
+        }
+        .link a:hover {
+            text-decoration: underline;
+        }
         .footer {
             border-top: 1px solid #e0e0e0;
             padding-top: 10px;
@@ -54,6 +65,11 @@
     <div class="content">
         <pre>{content}</pre>
     </div>
+    {#if refundLink}
+    <div class="link">
+        <a href="{refundLink}">Click here for more information</a>
+    </div>
+    {/if}
     <div class="footer">
         <p>&copy; 2024 Example GmbH. All rights reserved.</p>
     </div>

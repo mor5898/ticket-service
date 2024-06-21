@@ -11,9 +11,9 @@ import io.quarkus.qute.TemplateInstance;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.apache.pdfbox.pdmodel.PDDocument;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.List;
 
 @ApplicationScoped
 public class MailService {
@@ -29,6 +29,50 @@ public class MailService {
 
     private static final String BENEVOLO_REFUND_URL = "https://shop.benevolo.de/refund/?";
 
+    public void send(EmailBuilder emailBuilder) {
+        Customer customer = Customer.findById(emailBuilder.getCustomerId());
+        TemplateInstance templateInstance = emailTemplate
+                .data("headline", emailBuilder.getHeadline())
+                .data("emailSubject", emailBuilder.getSubject())
+                .data("content", emailBuilder.getContent());
+
+        String renderedContent = templateInstance.render();
+
+        mailer.send(
+                Mail.withHtml(customer.getEmail(), emailBuilder.getSubject(), renderedContent)
+        );
+    }
+
+    public void sendEmailWithPdf(EmailBuilder emailBuilder, PDDocument pdf, Booking booking) throws IOException {
+        try (ByteArrayOutputStream ticketOutputStream = new ByteArrayOutputStream()) {
+            pdf.save(ticketOutputStream);
+            Customer customer = booking.getCustomer();
+            String refundLink = BENEVOLO_REFUND_URL + refundLinkService.findIdByBookingId(booking.getId());
+            TemplateInstance templateInstance = emailTemplate
+                    .data("headline", emailBuilder.getHeadline())
+                    .data("emailSubject", emailBuilder.getSubject())
+                    .data("content", emailBuilder.getContent())
+                    .data("refundLink", refundLink);
+
+            String renderedContent = templateInstance.render();
+
+            mailer.send(
+                    Mail.withHtml(customer.getEmail(), emailBuilder.getSubject(), renderedContent)
+                            .addAttachment("ticket.pdf",
+                                    ticketOutputStream.toByteArray(),
+                                    "application/pdf")
+            );
+        }
+    }
+
+
+
+
+
+
+
+
+    // this is all supposed to be removed
     public void sendEmailWithPdf(PDDocument pdf, String bookingId) throws IOException {
         try (ByteArrayOutputStream ticketOutputStream = new ByteArrayOutputStream()) {
             pdf.save(ticketOutputStream);
@@ -58,19 +102,6 @@ public class MailService {
                         "Stornierung Ticket Benevolo Shop",
                         emailText
                 )
-        );
-    }
-
-    public void send(EmailBuilder emailBuilder) {
-        TemplateInstance templateInstance = emailTemplate
-                .data("headline", emailBuilder.getHeadline())
-                .data("emailSubject", emailBuilder.getSubject())
-                .data("content", emailBuilder.getContent());
-
-        String renderedContent = templateInstance.render();
-
-        mailer.send(
-                Mail.withHtml(emailBuilder.getRecipientEmail(), emailBuilder.getSubject(), renderedContent)
         );
     }
 }

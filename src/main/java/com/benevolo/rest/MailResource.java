@@ -10,6 +10,8 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.jboss.logmanager.Level;
+
+import java.awt.print.Book;
 import java.util.logging.Logger;
 
 @Path("/mail")
@@ -28,9 +30,35 @@ public class MailResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public void send(EmailBuilder emailBuilder) {
-        mailService.send(emailBuilder);
+        try {
+            mailService.send(emailBuilder);
+        } catch (Exception e) {
+            String msg = "Error while sending cancellation approval";
+            LOGGER.log(Level.SEVERE, msg, e);
+            throw new WebApplicationException(msg, Response.Status.INTERNAL_SERVER_ERROR);
+        }
     }
 
+    @POST
+    @Path("/attachment")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void sendEmailWithPdf(EmailBuilder emailBuilder) {
+        Booking booking = Booking.findById(emailBuilder.getBookingId());
+        try (PDDocument pdf = pdfService.createPdf(booking.getId())) {
+            mailService.sendEmailWithPdf(emailBuilder, pdf, booking);
+        } catch (Exception e) {
+            String msg = "Error while building and sending mail";
+            LOGGER.log(Level.SEVERE, msg, e);
+            throw new WebApplicationException(msg, Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+
+
+
+
+    // this is all supposed to be removed
     @POST
     @Path("/tickets")
     @Consumes(MediaType.APPLICATION_JSON)

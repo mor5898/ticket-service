@@ -5,7 +5,8 @@ public class EmailBuilder {
     private String headline;
     private String subject;
     private String content;
-    private String recipientEmail;
+    private String customerId;
+    private String bookingId;
 
     public String getHeadline() {
         return headline;
@@ -31,11 +32,20 @@ public class EmailBuilder {
         this.content = content;
     }
 
-    public String getRecipientEmail() {
-        return recipientEmail;
+    public void setBookingId(String bookingId) {
+        this.bookingId = bookingId;
     }
 
-    public void setRecipientEmail(String recipientEmail) {
-        this.recipientEmail = recipientEmail;
+    public String getBookingId() {
+        return bookingId;
     }
+
+    public String getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(String customerId) {
+        this.customerId = customerId;
+    }
+
 }
