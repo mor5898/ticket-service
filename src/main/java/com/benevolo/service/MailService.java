@@ -30,7 +30,6 @@ public class MailService {
     private static final String BENEVOLO_REFUND_URL = "https://shop.benevolo.de/refund/?";
 
     public void send(EmailBuilder emailBuilder) {
-        Customer customer = Customer.findById(emailBuilder.getCustomerId());
         TemplateInstance templateInstance = emailTemplate
                 .data("headline", emailBuilder.getHeadline())
                 .data("emailSubject", emailBuilder.getSubject())
@@ -40,7 +39,7 @@ public class MailService {
         String renderedContent = templateInstance.render();
 
         mailer.send(
-                Mail.withHtml(customer.getEmail(), emailBuilder.getSubject(), renderedContent)
+                Mail.withHtml(emailBuilder.getCustomerMail(), emailBuilder.getSubject(), renderedContent)
         );
     }
 
