@@ -1,17 +1,19 @@
 package com.benevolo.rest;
 
 import com.benevolo.entity.Booking;
+import com.benevolo.repo.BookingRepo;
 import com.benevolo.service.MailService;
 import com.benevolo.service.PdfService;
 import com.benevolo.utils.EmailBuilder;
+import io.quarkus.panache.common.Parameters;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
-import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.jboss.logmanager.Level;
 
-import java.awt.print.Book;
+import java.util.List;
 import java.util.logging.Logger;
 
 @Path("/mail")
@@ -26,6 +28,9 @@ public class MailResource {
 
     @Inject
     MailService mailService;
+
+    @Inject
+    BookingRepo bookingRepo;
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -53,10 +58,19 @@ public class MailResource {
         }
     }
 
-
-
-
-
+    @POST
+    @Path("/reminder")
+    public void sendEventReminder(String eventId) {
+        List<Booking> bookings = bookingRepo.find("eventId = :eventId", Parameters.with("eventId", eventId)).list();
+        for(Booking booking : bookings) {
+            EmailBuilder emailBuilder = new EmailBuilder();
+            emailBuilder.setCustomerMail(booking.getCustomer().getEmail());
+            emailBuilder.setContent("Sehr geehrter Kunde,\n gerne möchten wir sie darauf hinweisen, dass in 5 Tagen das Festival startet.");
+            emailBuilder.setHeadline("Event Reminder");
+            emailBuilder.setSubject("Event Reminder");
+            mailService.send(emailBuilder);
+        }
+    }
 
     // this is all supposed to be removed
     @POST
