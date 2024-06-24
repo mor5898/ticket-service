@@ -4,6 +4,7 @@ import com.benevolo.client.TicketTypeClient;
 import com.benevolo.entity.Ticket;
 import com.benevolo.rest.params.BookingSearchParams;
 import com.benevolo.service.TicketService;
+import com.benevolo.utils.TicketStatus;
 import io.vertx.core.http.HttpServerResponse;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -78,7 +79,7 @@ public class TicketResource {
         tickets.forEach(ticket -> {
             ticket.getBookingItem().setTicketType(ticketTypeClient.findById(ticket.getBookingItem().getTicketTypeId()));
         });
-        return ticketService.findByRefundId(refundId);
+        return tickets.stream().filter(item -> item.getStatus() == TicketStatus.VALID).toList();
     }
 
 }
