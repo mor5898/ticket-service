@@ -60,6 +60,7 @@ public class MailResource {
 
     @POST
     @Path("/reminder")
+    @Consumes(MediaType.TEXT_PLAIN)
     public void sendEventReminder(String eventId) {
         List<Booking> bookings = bookingRepo.find("eventId = :eventId", Parameters.with("eventId", eventId)).list();
         for(Booking booking : bookings) {
