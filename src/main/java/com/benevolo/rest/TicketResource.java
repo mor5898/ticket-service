@@ -4,6 +4,7 @@ import com.benevolo.client.TicketTypeClient;
 import com.benevolo.entity.Ticket;
 import com.benevolo.rest.params.BookingSearchParams;
 import com.benevolo.service.TicketService;
+import com.benevolo.utils.TicketStatus;
 import io.vertx.core.http.HttpServerResponse;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -38,6 +39,14 @@ public class TicketResource {
         ticketService.redeemTicket(ticketId);
     }
 
+    @PUT
+    @Path("/{ticketId}/status/cancelled")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public void cancelTicket(@PathParam("ticketId") String ticketId) {
+        ticketService.cancelTicket(ticketId);
+    }
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<Ticket> findTicketsByBookingItemId(@QueryParam("bookingItemId") String bookingItemId) {
@@ -66,7 +75,11 @@ public class TicketResource {
     @Path("/public/{refundId}")
     @Produces(MediaType.APPLICATION_JSON)
     public List<Ticket> findTicketsByBookingId(@PathParam("refundId") String refundId) {
-        return ticketService.findByRefundId(refundId);
+        List<Ticket> tickets = ticketService.findByRefundId(refundId);
+        tickets.forEach(ticket -> {
+            ticket.getBookingItem().setTicketType(ticketTypeClient.findById(ticket.getBookingItem().getTicketTypeId()));
+        });
+        return tickets.stream().filter(item -> item.getStatus() == TicketStatus.VALID).toList();
     }
 
 }

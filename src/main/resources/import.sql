@@ -82,7 +82,7 @@ CREATE TABLE booking_item (
 
 CREATE TABLE ticket (
     id VARCHAR(256),
-    public_id VARCHAR(6),
+    public_id VARCHAR(30),
     status VARCHAR(32),
     price INTEGER,
     tax_rate INTEGER,

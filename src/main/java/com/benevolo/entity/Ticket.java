@@ -1,10 +1,13 @@
 package com.benevolo.entity;
 
 import com.benevolo.utils.TicketStatus;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Random;
 
 @Entity
@@ -36,6 +39,10 @@ public class Ticket extends PanacheEntityBase {
 
     @Transient
     private LocalDateTime bookedAt;
+
+    @JsonBackReference
+    @OneToMany(mappedBy = "ticket")
+    private List<Cancellation> cancellations;
 
     public Ticket() {
         // empty constructor
@@ -119,5 +126,13 @@ public class Ticket extends PanacheEntityBase {
 
     public void setBookedAt(LocalDateTime bookedAt) {
         this.bookedAt = bookedAt;
+    }
+
+    public List<Cancellation> getCancellations() {
+        return cancellations;
+    }
+
+    public void setCancellations(List<Cancellation> cancellations) {
+        this.cancellations = cancellations;
     }
 }
