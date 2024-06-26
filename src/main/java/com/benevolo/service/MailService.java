@@ -2,7 +2,6 @@ package com.benevolo.service;
 
 import com.benevolo.entity.Booking;
 import com.benevolo.entity.Customer;
-import com.benevolo.entity.Ticket;
 import com.benevolo.utils.EmailBuilder;
 import io.quarkus.mailer.Mail;
 import io.quarkus.mailer.Mailer;
@@ -63,45 +62,5 @@ public class MailService {
                                     "application/pdf")
             );
         }
-    }
-
-
-
-
-
-
-
-
-    // this is all supposed to be removed
-    public void sendEmailWithPdf(PDDocument pdf, String bookingId) throws IOException {
-        try (ByteArrayOutputStream ticketOutputStream = new ByteArrayOutputStream()) {
-            pdf.save(ticketOutputStream);
-            Booking booking = Booking.findById(bookingId);
-            Customer customer = booking.getCustomer();
-
-            mailer.send(
-                    Mail.withText(customer.getEmail(),
-                            "Tickets Benevolo Shop",
-                            "Ihre Tickets sind im Anhang zu finden. \n \n" +
-                                    "Sie können die Tickets zu ihrer Bestellung unter folgendem Link stornieren: \n" +
-                                    BENEVOLO_REFUND_URL + refundLinkService.findIdByBookingId(bookingId)
-                    ).addAttachment("ticket.pdf",
-                            ticketOutputStream.toByteArray(),
-                            "application/pdf")
-            );
-        }
-    }
-
-    public void sendCancellation(String ticketId, boolean isApproved) {
-        Ticket ticket = Ticket.findById(ticketId);
-        Customer customer = ticket.getBookingItem().getBooking().getCustomer();
-        String emailText = "Die Stornierung ihrer Tickets konnte " + (isApproved ? "erfolgreich" : "nicht erfolgreich") +
-                " durchgeführt werden. Bei weiteren Fragen, wenden sie sich bitte an den Benevolo-Support.";
-        mailer.send(
-                Mail.withText(customer.getEmail(),
-                        "Stornierung Ticket Benevolo Shop",
-                        emailText
-                )
-        );
     }
 }

@@ -1,12 +1,10 @@
 package com.benevolo.service;
 
-import com.benevolo.entity.Booking;
 import com.benevolo.entity.Cancellation;
 import com.benevolo.repo.CancellationRepo;
 import com.benevolo.repo.RefundLinkRepo;
 import com.benevolo.repo.TicketRepo;
 import com.benevolo.utils.CancellationStatus;
-import com.benevolo.utils.TicketStatus;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -22,9 +20,6 @@ public class CancellationService {
     CancellationRepo cancellationRepo;
 
     @Inject
-    RefundLinkService refundLinkService;
-
-    @Inject
     RefundLinkRepo refundLinkRepo;
 
     @Inject
@@ -32,7 +27,7 @@ public class CancellationService {
 
     @Transactional
     public Cancellation changeCancellationStatus(String cancellationId, boolean isApproved) {
-        Cancellation cancellation = Cancellation.findById(cancellationId);
+        Cancellation cancellation = cancellationRepo.findById(cancellationId);
         if (cancellation == null) {
             throw new NotFoundException("Cancellation with ID " + cancellationId + " not found");
         }
