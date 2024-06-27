@@ -5,6 +5,7 @@ import com.benevolo.includes.mocks.TicketTypeClientMock;
 import com.benevolo.repo.*;
 import com.benevolo.service.CancellationService;
 import com.benevolo.utils.CancellationStatus;
+import com.benevolo.utils.TicketStatus;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.security.TestSecurity;
@@ -23,6 +24,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Collections;
 import java.util.List;
 
 @QuarkusTest
@@ -39,6 +41,15 @@ class CancellationTest {
     @Inject
     CancellationService cancellationService;
 
+    @Inject
+    BookingItemRepo bookingItemRepo;
+
+    @Inject
+    TicketRepo ticketRepo;
+
+    @Inject
+    RefundLinkRepo refundLinkRepo;
+
     @BeforeEach
     @Transactional
     void setUp() {
@@ -47,9 +58,27 @@ class CancellationTest {
         booking1.setEventId(event.getId());
         bookingRepo.persist(booking1);
 
+        BookingItem bookingItem = new BookingItem();
+        bookingItem.setQuantity(2);
+        bookingItem.setBooking(booking1);
+        bookingItemRepo.persist(bookingItem);
+
+        Ticket ticket = new Ticket();
+        ticket.setBookingItem(bookingItem);
+        ticket.setPublicId("485784");
+        ticket.setStatus(TicketStatus.VALID);
+        ticket.setPrice(2000);
+        ticket.setTaxRate(19);
+        ticketRepo.persist(ticket);
+
+        RefundLink refundLink = new RefundLink();
+        refundLink.setBookings(Collections.singletonList(booking1));
+        refundLinkRepo.persist(refundLink);
+
         Cancellation cancellation = new Cancellation();
         cancellation.setStatus(CancellationStatus.PENDING);
         cancellation.setBooking(booking1);
+        cancellation.setTicket(ticket);
         cancellationRepo.persist(cancellation);
 
         Event event2 = new Event("event_id_2", "Event 2", new Address("Street", "City", "State", "Zip"), false);
@@ -67,6 +96,9 @@ class CancellationTest {
     @Transactional
     void tearDown() {
         cancellationRepo.deleteAll();
+        refundLinkRepo.deleteAll();
+        ticketRepo.deleteAll();
+        bookingItemRepo.deleteAll();
         bookingRepo.deleteAll();
     }
 
@@ -137,5 +169,15 @@ class CancellationTest {
         // Test for non-existent event_id
         List<Cancellation> cancellationsEvent3 = cancellationRepo.findAllByEventId("non_existent_event_id");
         assertTrue(cancellationsEvent3.isEmpty());
+    }
+
+    @Test
+    void testGetAllCancellationsResource() {
+        given()
+                .when()
+                .get("/cancellations")
+                .then()
+                .statusCode(200)
+                .body("size()", equalTo(2));
     }
 }
