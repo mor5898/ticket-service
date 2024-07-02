@@ -20,56 +20,77 @@ jobs:
       MAILER_PASSWORD: ${{ secrets.MAILER_PASSWORD }}
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Set up JDK 21
-      uses: actions/setup-java@v4
-      with:
-        java-version: '21'
-        distribution: 'corretto'
-        maven-version: '3.9.6'  # specify Maven version here
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+          maven-version: '3.9.6'  # specify Maven version here
 
-    - name: Set env variables for prod
-      if: github.ref == 'refs/heads/main'
-      run: |
-        echo "CORS_ORIGIN=https://benevolo.de,https://shop.benevolo.de" >> $GITHUB_ENV
-        echo "DOCKER_IMAGE_NAME=ghcr.io/thi24/benevolo.ticket-service" >> $GITHUB_ENV
-        echo "EVENT_SERVICE_BASE_URL=https://benevolo.de/api/event-service" >> $GITHUB_ENV
-
-    - name: Set env variables for dev
-      if: github.ref == 'refs/heads/develop'
-      run: |
-        echo "CORS_ORIGIN=https://benevolo.de,https://shop.benevolo.de,https://localhost:3000" >> $GITHUB_ENV
-        echo "DOCKER_IMAGE_NAME=ghcr.io/thi24/dev.benevolo.ticket-service" >> $GITHUB_ENV
-        echo "EVENT_SERVICE_BASE_URL=https://dev.benevolo.de/api/event-service" >> $GITHUB_ENV
-
-    - name: Build jar
-      run: mvn package
-
-    - name: Log in to the Container registry
-      uses: docker/login-action@v3
-      with:
-        registry: ghcr.io
-        username: ${{ github.repository_owner }}
-        password: ${{ secrets.OWNER_PASSWORD }}
+      - name: Cache SonarQube packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+      - name: Cache Maven packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+      - name: Build and analyze
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: http://37.27.45.27:9000
+        run: mvn -Pcoverage -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=ticket-service -Dsonar.projectName='ticket-service'
 
 
-    - name: Build and push Docker image
-      run: |
-        docker build \
-        -f src/main/docker/Dockerfile.jvm \
-        --build-arg DATABASE_USERNAME=$DATABASE_USERNAME \
-        --build-arg DATABASE_PASSWORD=$DATABASE_PASSWORD \
-        --build-arg KEYCLOAK_SECRET=$KEYCLOAK_SECRET \
-        --build-arg CORS_ORIGIN=$CORS_ORIGIN \
-        --build-arg EVENT_SERVICE_BASE_URL=$EVENT_SERVICE_BASE_URL \
-        --build-arg MAILER_FROM_MAIL=$MAILER_FROM_MAIL \
-        --build-arg MAILER_USERNAME=$MAILER_USERNAME \
-        --build-arg MAILER_PASSWORD=$MAILER_PASSWORD \
-        -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG .
-        
-        docker push $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
+      - name: Set env variables for prod
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo "CORS_ORIGIN=https://benevolo.de,https://shop.benevolo.de" >> $GITHUB_ENV
+          echo "DOCKER_IMAGE_NAME=ghcr.io/thi24/benevolo.ticket-service" >> $GITHUB_ENV
+          echo "EVENT_SERVICE_BASE_URL=https://benevolo.de/api/event-service" >> $GITHUB_ENV
+
+      - name: Set env variables for dev
+        if: github.ref == 'refs/heads/develop'
+        run: |
+          echo "CORS_ORIGIN=https://benevolo.de,https://shop.benevolo.de,https://localhost:3000" >> $GITHUB_ENV
+          echo "DOCKER_IMAGE_NAME=ghcr.io/thi24/dev.benevolo.ticket-service" >> $GITHUB_ENV
+          echo "EVENT_SERVICE_BASE_URL=https://dev.benevolo.de/api/event-service" >> $GITHUB_ENV
+
+      - name: Build jar
+        run: mvn package
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.OWNER_PASSWORD }}
+
+
+      - name: Build and push Docker image
+        run: |
+          docker build \
+          -f src/main/docker/Dockerfile.jvm \
+          --build-arg DATABASE_USERNAME=$DATABASE_USERNAME \
+          --build-arg DATABASE_PASSWORD=$DATABASE_PASSWORD \
+          --build-arg KEYCLOAK_SECRET=$KEYCLOAK_SECRET \
+          --build-arg CORS_ORIGIN=$CORS_ORIGIN \
+          --build-arg EVENT_SERVICE_BASE_URL=$EVENT_SERVICE_BASE_URL \
+          --build-arg MAILER_FROM_MAIL=$MAILER_FROM_MAIL \
+          --build-arg MAILER_USERNAME=$MAILER_USERNAME \
+          --build-arg MAILER_PASSWORD=$MAILER_PASSWORD \
+          -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG .
+          
+          docker push $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
 
 
   deploymain:
@@ -77,29 +98,29 @@ jobs:
     needs: build
     if: github.ref == 'refs/heads/main'
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
           repository: 'thi24/gitops'
           ref: 'main'
-          token:  ${{ secrets.GITOPS }}
+          token: ${{ secrets.GITOPS }}
 
-    - name: Setup git config
-      run: |
-        git config --global user.name "GitHub Actions"
-        git config --global user.email "<>"
+      - name: Setup git config
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "<>"
 
-    - name: Update docker image version
-      run: |
-        wget https://github.com/mikefarah/yq/releases/download/v4.42.1/yq_linux_amd64 -O yq &&\
-        chmod +x yq
-        NEW_VERSION=${{ github.sha }}
-        yq e '.services["benevolo.ticket-service"].image = "ghcr.io/thi24/benevolo.ticket-service:'"$NEW_VERSION"'"' -i docker-compose.yml
+      - name: Update docker image version
+        run: |
+          wget https://github.com/mikefarah/yq/releases/download/v4.42.1/yq_linux_amd64 -O yq &&\
+          chmod +x yq
+          NEW_VERSION=${{ github.sha }}
+          yq e '.services["benevolo.ticket-service"].image = "ghcr.io/thi24/benevolo.ticket-service:'"$NEW_VERSION"'"' -i docker-compose.yml
 
-    - name: Commit and push changes
-      run: |
-        git commit -a -m "updated by GitHub Actions"
-        git push
+      - name: Commit and push changes
+        run: |
+          git commit -a -m "updated by GitHub Actions"
+          git push
 
 
 
@@ -108,26 +129,26 @@ jobs:
     needs: build
     if: github.ref == 'refs/heads/develop'
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
           repository: 'thi24/gitops-dev'
           ref: 'main'
-          token:  ${{ secrets.GITOPS }}
+          token: ${{ secrets.GITOPS }}
 
-    - name: Setup git config
-      run: |
-        git config --global user.name "GitHub Actions"
-        git config --global user.email "<>"
+      - name: Setup git config
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "<>"
 
-    - name: Update docker image version
-      run: |
-        wget https://github.com/mikefarah/yq/releases/download/v4.42.1/yq_linux_amd64 -O yq &&\
-        chmod +x yq
-        NEW_VERSION=${{ github.sha }}
-        yq e '.services["dev.benevolo.ticket-service"].image = "ghcr.io/thi24/dev.benevolo.ticket-service:'"$NEW_VERSION"'"' -i docker-compose.yml
+      - name: Update docker image version
+        run: |
+          wget https://github.com/mikefarah/yq/releases/download/v4.42.1/yq_linux_amd64 -O yq &&\
+          chmod +x yq
+          NEW_VERSION=${{ github.sha }}
+          yq e '.services["dev.benevolo.ticket-service"].image = "ghcr.io/thi24/dev.benevolo.ticket-service:'"$NEW_VERSION"'"' -i docker-compose.yml
 
-    - name: Commit and push changes
-      run: |
-        git commit -a -m "updated by GitHub Actions"
-        git push
+      - name: Commit and push changes
+        run: |
+          git commit -a -m "updated by GitHub Actions"
+          git push
