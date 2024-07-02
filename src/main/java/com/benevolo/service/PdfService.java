@@ -35,32 +35,31 @@ public class PdfService {
     TicketTypeClient ticketTypeClient;
 
     public PDDocument createPdf(String bookingId) throws WriterException, IOException {
-        PDDocument document = new PDDocument();
-        Booking booking = bookingRepo.findById(bookingId);
-        List<BookingItem> bookingItemList = booking.getBookingItems();
-
-        for (BookingItem item : bookingItemList) {
-            String ticketTypeId = item.getTicketTypeId();
-            TicketType ticketType = ticketTypeClient.findById(ticketTypeId);
-            int count = 0;
-            List<Ticket> tickets = item.getTickets();
-            PDPage page = new PDPage();
-            document.addPage(page);
-            for (Ticket ticket : tickets) {
-                if (count >= 3) {
-                    page = new PDPage();
-                    document.addPage(page);
-                    count = 0;
+        try (PDDocument document = new PDDocument()) {
+            Booking booking = bookingRepo.findById(bookingId);
+            List<BookingItem> bookingItemList = booking.getBookingItems();
+            for (BookingItem item : bookingItemList) {
+                String ticketTypeId = item.getTicketTypeId();
+                TicketType ticketType = ticketTypeClient.findById(ticketTypeId);
+                int count = 0;
+                List<Ticket> tickets = item.getTickets();
+                PDPage page = new PDPage();
+                document.addPage(page);
+                for (Ticket ticket : tickets) {
+                    if (count >= 3) {
+                        page = new PDPage();
+                        document.addPage(page);
+                        count = 0;
+                    }
+                    String ticketId = ticket.getId();
+                    PDImageXObject qrCodeImage = PDImageXObject.createFromByteArray(document, qrCodeService.generateQRCode(ticketId).toByteArray(), "qrCode");
+                    float startY = 750 - (count * 250);
+                    drawTicket(document, page, startY, qrCodeImage, ticket, ticketType);
+                    count++;
                 }
-                String ticketId = ticket.getId();
-                PDImageXObject qrCodeImage = PDImageXObject.createFromByteArray(document, qrCodeService.generateQRCode(ticketId).toByteArray(), "qrCode");
-                float startY = 750 - (count * 250);
-                drawTicket(document, page, startY, qrCodeImage, ticket, ticketType);
-                count++;
-
             }
+            return document;
         }
-        return document;
     }
 
     private static void drawTicket(PDDocument document, PDPage page, float startY, PDImageXObject qrCode, Ticket ticket, TicketType ticketType) throws IOException {

@@ -44,8 +44,6 @@ public class CancellationResource {
         }); 
 
         return result;
-        
-        //return cancellationRepo.findAllByEventId(eventId);
     }
 
     @GET
