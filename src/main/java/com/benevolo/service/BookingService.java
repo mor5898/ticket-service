@@ -15,7 +15,6 @@ import com.benevolo.utils.query_builder.util.Compartor;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.WebApplicationException;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import java.time.LocalDate;
@@ -38,9 +37,6 @@ public class BookingService {
 
     @Transactional
     public Booking save(Booking booking) {
-        if (booking == null || booking.getBookingItems() == null) {
-            throw new WebApplicationException("Booking nicht verfügbar", 400);
-        }
         for (BookingItem bookingItem : booking.getBookingItems()) {
             bookingItem.setBooking(booking);
             booking.setBookedAt(LocalDateTime.now());
@@ -60,7 +56,7 @@ public class BookingService {
 
     private int calculateTotal(List<BookingItem> bookingItems) {
         int total = 0;
-        for (BookingItem bookingItem : bookingItems) {
+        for(BookingItem bookingItem: bookingItems) {
             total += bookingItem.getTicketType().getPrice() * bookingItem.getQuantity();
         }
         return total;
@@ -85,28 +81,28 @@ public class BookingService {
         queryBuilder.add(QuerySection.of("eventId", Compartor.EQUAlS, eventId));
 
         String term = params.term;
-        if (term != null && !term.isBlank()) {
+        if(term != null && !term.isBlank()) {
             queryBuilder.add(QueryCustomSection.of("LOWER(id) LIKE :term OR LOWER(customer.email) LIKE :term", Map.of("term", "%" + term + "%")));
         }
 
         LocalDate dateFrom = params.dateFrom;
-        if (dateFrom != null) {
+        if(dateFrom != null) {
             queryBuilder.add(QuerySection.of("bookedAt", Compartor.GREATER_THAN_OR_EQUALS, params.dateFrom.atStartOfDay()));
         }
 
         LocalDate dateTo = params.dateTo;
-        if (dateTo != null) {
+        if(dateTo != null) {
             queryBuilder.add(QuerySection.of("bookedAt", Compartor.LESS_THAN, dateTo.plusDays(1).atStartOfDay()));
         }
 
         Integer priceFrom = params.priceFrom;
-        if (priceFrom != null) {
-            queryBuilder.add(QuerySection.of("totalPrice", Compartor.GREATER_THAN_OR_EQUALS, Math.round((priceFrom * 1.0F) * 100)));
+        if(priceFrom != null) {
+            queryBuilder.add(QuerySection.of("totalPrice", Compartor.GREATER_THAN_OR_EQUALS, Math.round((priceFrom*1.0F)*100)));
         }
 
         Integer priceTo = params.priceTo;
-        if (priceTo != null) {
-            queryBuilder.add(QuerySection.of("totalPrice", Compartor.LESS_THAN_OR_EQUALS, Math.round((priceTo * 1.0F) * 100)));
+        if(priceTo != null) {
+            queryBuilder.add(QuerySection.of("totalPrice", Compartor.LESS_THAN_OR_EQUALS, Math.round((priceTo*1.0F)*100)));
         }
 
         return queryBuilder;
