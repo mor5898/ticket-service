@@ -86,12 +86,9 @@ public class PdfServiceTest {
         mockQrCodeStream.write(mockImageData);
         when(qrCodeService.generateQRCode(anyString())).thenReturn(mockQrCodeStream);
 
-        PDDocument document = pdfService.createPdf(bookingId);
+        byte[] document = pdfService.createPdf(bookingId);
 
         assertNotNull(document, "PDF document should not be null");
-        assertNotNull(document.getPage(0), "PDF should have at least one page");
-
-        document.close();
     }
 
     private byte[] generateMockQRCodeImageBytes(String ticketId) {

@@ -44,7 +44,8 @@ public class MailResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public void sendEmailWithPdf(EmailBuilder emailBuilder) {
         Booking booking = bookingRepo.findById(emailBuilder.getBookingId());
-        try (PDDocument pdf = pdfService.createPdf(booking.getId())) {
+        try {
+            byte[] pdf = pdfService.createPdf(booking.getId());
             mailService.sendEmailWithPdf(emailBuilder, pdf, booking);
         } catch (Exception e) {
             String msg = "Error while building ticket pdf and sending mail";

@@ -42,25 +42,22 @@ public class MailService {
         );
     }
 
-    public void sendEmailWithPdf(EmailBuilder emailBuilder, PDDocument pdf, Booking booking) throws IOException {
-        try (ByteArrayOutputStream ticketOutputStream = new ByteArrayOutputStream()) {
-            pdf.save(ticketOutputStream);
-            Customer customer = booking.getCustomer();
-            String refundLink = BENEVOLO_REFUND_URL + refundLinkService.findIdByBookingId(booking.getId());
-            TemplateInstance templateInstance = emailTemplate
-                    .data("headline", emailBuilder.getHeadline())
-                    .data("emailSubject", emailBuilder.getSubject())
-                    .data("content", emailBuilder.getContent())
-                    .data("refundLink", refundLink);
+    public void sendEmailWithPdf(EmailBuilder emailBuilder, byte[] pdfContent, Booking booking) throws IOException {
+        Customer customer = booking.getCustomer();
+        String refundLink = BENEVOLO_REFUND_URL + refundLinkService.findIdByBookingId(booking.getId());
+        TemplateInstance templateInstance = emailTemplate
+                .data("headline", emailBuilder.getHeadline())
+                .data("emailSubject", emailBuilder.getSubject())
+                .data("content", emailBuilder.getContent())
+                .data("refundLink", refundLink);
 
-            String renderedContent = templateInstance.render();
+        String renderedContent = templateInstance.render();
 
-            mailer.send(
-                    Mail.withHtml(customer.getEmail(), emailBuilder.getSubject(), renderedContent)
-                            .addAttachment("ticket.pdf",
-                                    ticketOutputStream.toByteArray(),
-                                    "application/pdf")
-            );
-        }
+        mailer.send(
+                Mail.withHtml(customer.getEmail(), emailBuilder.getSubject(), renderedContent)
+                        .addAttachment("ticket.pdf",
+                                pdfContent,
+                                "application/pdf")
+        );
     }
 }

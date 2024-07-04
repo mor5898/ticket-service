@@ -61,16 +61,16 @@ public class MailResourceTest {
         Booking booking = new Booking();
         booking.setId(bookingId);
 
-        PDDocument mockPdfDocument = mock(PDDocument.class);
-        when(pdfService.createPdf(anyString())).thenReturn(mockPdfDocument);
-        doNothing().when(mailService).sendEmailWithPdf(emailBuilder, mockPdfDocument, booking);
+        byte[] mockPdfContent = new byte[] {1, 2, 3};
+        when(pdfService.createPdf(anyString())).thenReturn(mockPdfContent);
+        doNothing().when(mailService).sendEmailWithPdf(emailBuilder, mockPdfContent, booking);
         when(bookingRepo.findById(anyString())).thenReturn(booking);
 
         mailResource.sendEmailWithPdf(emailBuilder);
 
         verify(bookingRepo, times(1)).findById(bookingId);
         verify(pdfService, times(1)).createPdf(bookingId);
-        verify(mailService, times(1)).sendEmailWithPdf(emailBuilder, mockPdfDocument, booking);
+        verify(mailService, times(1)).sendEmailWithPdf(emailBuilder, mockPdfContent, booking);
     }
 
     @Test

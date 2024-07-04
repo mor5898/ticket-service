@@ -17,6 +17,7 @@ import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
@@ -34,7 +35,7 @@ public class PdfService {
     @RestClient
     TicketTypeClient ticketTypeClient;
 
-    public PDDocument createPdf(String bookingId) throws WriterException, IOException {
+    public byte[] createPdf(String bookingId) throws WriterException, IOException {
         try (PDDocument document = new PDDocument()) {
             Booking booking = bookingRepo.findById(bookingId);
             List<BookingItem> bookingItemList = booking.getBookingItems();
@@ -58,7 +59,10 @@ public class PdfService {
                     count++;
                 }
             }
-            return document;
+            try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+                document.save(outputStream);
+                return outputStream.toByteArray();
+            }
         }
     }
 
